@@ -8,6 +8,7 @@
 void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
 {
     chunk.setSunlight(position, lightLevel);
+    chunk.setSunlight(position + glm::ivec3{0, 0, -1}, std::max(lightLevel - 2, 1));
 
     auto v = chunk.qGetVoxel(position);
     if (v == AIR)
@@ -29,35 +30,21 @@ void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
         return;
     }
 
-    if (chunk.getSunlight({position.x + 1, position.y, position.z}) < lightLevel)
-    {
-        floodLights(chunk, {position.x + 1, position.y, position.z}, lightLevel);
-    }
+    auto tryFlood = [&](const glm::ivec3 offset) {
+        auto newFloodPosition = position + offset;
 
-    if (chunk.getSunlight({position.x - 1, position.y, position.z}) < lightLevel)
-    {
-        floodLights(chunk, {position.x - 1, position.y, position.z}, lightLevel);
-    }
+        if (chunk.getSunlight(newFloodPosition) < lightLevel)
+        {
+            floodLights(chunk, newFloodPosition, lightLevel);
+        } 
+    };
 
-    if (chunk.getSunlight({position.x, position.y + 1, position.z}) < lightLevel)
-    {
-        floodLights(chunk, {position.x, position.y + 1, position.z}, lightLevel);
-    }
-
-    if (chunk.getSunlight({position.x, position.y - 1, position.z}) < lightLevel)
-    {
-        floodLights(chunk, {position.x, position.y - 1, position.z}, lightLevel);
-    }
-
-    if (chunk.getSunlight({position.x, position.y, position.z + 1}) < lightLevel)
-    {
-        floodLights(chunk, {position.x, position.y, position.z + 1}, lightLevel);
-    }
-
-    if (chunk.getSunlight({position.x, position.y, position.z - 1}) < lightLevel)
-    {
-        floodLights(chunk, {position.x, position.y, position.z - 1}, lightLevel);
-    }
+    tryFlood({1, 0, 0});
+    tryFlood({-1, 0, 0});
+    tryFlood({0, 1, 0});
+    tryFlood({0, -1, 0});
+   // tryFlood({1, 0, 1});
+   // tryFlood({1, 0, -1});
 }
 
 Game::Game()
@@ -94,7 +81,7 @@ Game::Game()
                 {
                     if (chunk.qGetVoxel({x, y, 0}) == AIR)
                     {
-                        floodLights(chunk, {x, y, 1}, 15);
+                        floodLights(chunk, {x, y, 1}, 16);
                     }
                 }
             }
