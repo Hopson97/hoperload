@@ -16,26 +16,52 @@ Game::Game()
     float aspect = (float)WIDTH / (float)HEIGHT;
     m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
 
-    m_cameraTransform = {{0, 15, 0}, {0, 0, 0}};
     m_lightTransform = {{0, 15, 0}, {0, 0, 0}};
 
     m_chunkTextures.create(16, 16);
     initVoxelSystem(m_chunkTextures);
-    for (int x = 0; x < 2; x++)
+
+    int height = 4;
+    int heightInVoxels = (height * CHUNK_SIZE) - 1;
+    m_cameraTransform = {{50, heightInVoxels, 50}, {0, 270, 0}};
+
+    for (int cx = 0; cx < 2; cx++)
     {
-        for (int y = 0; y < 64; y++)
+        for (int cy = 0; cy < 4; cy++)
         {
-            Chunk& c = m_chunkMap.addChunk({x, y});
+            Chunk& c = m_chunkMap.addChunk({cx, cy});
 
             for (int y = 0; y < CHUNK_SIZE; y++)
             {
                 for (int x = 0; x < CHUNK_SIZE; x++)
                 {
-                    if (rand() % 64 < 40)
+                    auto h = CHUNK_SIZE * cy + y;
+                    if (h == heightInVoxels)
                     {
                         c.setVoxel({x, y, 0}, GRASS);
+                        c.setVoxel({x, y, 1}, GRASS);
                     }
-                    // c.setVoxel({x, y, 1}, GRASS);
+                    else if (h > heightInVoxels - 3)
+                    {
+                        c.setVoxel({x, y, 0}, DIRT);
+                        c.setVoxel({x, y, 1}, DIRT);
+                    }
+                    else if (h > heightInVoxels - CHUNK_SIZE)
+                    {
+                        c.setVoxel({x, y, 0}, DIRT);
+                        if (rand() % 64 < 40)
+                        {
+                            c.setVoxel({x, y, 1}, DIRT);
+                        }
+                    }
+                    else
+                    {
+                        c.setVoxel({x, y, 0}, STONE);
+                        if (rand() % 64 < 40)
+                        {
+                            c.setVoxel({x, y, 1}, STONE);
+                        }
+                    }
                 }
             }
 

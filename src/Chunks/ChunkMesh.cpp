@@ -57,11 +57,10 @@ void ChunkMesh::addVoxelFace(const VoxelMeshFace& face, const ChunkPosition& chu
                              const VoxelPosition& blockPos, GLfloat textureId)
 {
     glm::ivec3 chunkPos3d = {chunkPos.x, chunkPos.y, 0};
-    glm::ivec3 blockPos3d = {blockPos.x, blockPos.y, 0};
     for (int i = 0; i < 4; i++)
     {
         VoxelVertex v;
-        v.position = face.vertexPositions[i] + chunkPos3d * CHUNK_SIZE + blockPos3d;
+        v.position = face.vertexPositions[i] + chunkPos3d * CHUNK_SIZE + blockPos;
         v.textureCoord = glm::vec3(textureCoords[i].x, textureCoords[i].y, textureId);
         v.light = face.light;
         vertices.push_back(v);
@@ -86,47 +85,52 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
     {
         for (int x = 0; x < CHUNK_SIZE; x++)
         {
-            // If it is "not air"
-            VoxelPosition voxelPosition(x, y, 0);
-            auto voxel = chunk.qGetVoxel(voxelPosition);
-            if (voxel > VoxelType::WATER)
+            for (int z = 0; z < CHUNK_DEPTH; z++)
             {
-                auto& voxData = getVoxelType((VoxelType)chunk.qGetVoxel({x, y, 0}));
+                // If it is "not air"
+                VoxelPosition voxelPosition(x, y, z);
+                auto voxel = chunk.qGetVoxel(voxelPosition);
+                auto& voxData = getVoxelType((VoxelType)chunk.qGetVoxel({x, y, z}));
 
-                // Left voxel face
-                if (shouldMakeFace(voxel, chunk.getVoxel({x - 1, y, 0})))
+                if (voxel != AIR)
                 {
-                    mesh.addVoxelFace(LEFT_FACE, p, voxelPosition, voxData.textureSide);
-                }
 
-                // Right chunk face
-                if (shouldMakeFace(voxel, chunk.getVoxel({x + 1, y, 0})))
-                {
-                    mesh.addVoxelFace(RIGHT_FACE, p, voxelPosition, voxData.textureSide);
-                }
+                    // Left voxel face
+                    if (shouldMakeFace(voxel, chunk.getVoxel({x - 1, y, z})))
+                    {
+                        mesh.addVoxelFace(LEFT_FACE, p, voxelPosition,
+                                          voxData.textureSide);
+                    }
 
-                // Front chunk face
-                mesh.addVoxelFace(FRONT_FACE, p, voxelPosition, voxData.textureSide);
+                    // Right chunk face
+                    if (shouldMakeFace(voxel, chunk.getVoxel({x + 1, y, z})))
+                    {
+                        mesh.addVoxelFace(RIGHT_FACE, p, voxelPosition,
+                                          voxData.textureSide);
+                    }
 
-                // Back chunk face
-                mesh.addVoxelFace(BACK_FACE, p, voxelPosition, voxData.textureSide);
+                    // Front chunk face
+                    if (shouldMakeFace(voxel, chunk.getVoxel({x, y, z + 1})))
+                    {
+                        mesh.addVoxelFace(FRONT_FACE, p, voxelPosition,
+                                          voxData.textureSide);
+                    }
+                    // Bottom chunk face
+                    if (shouldMakeFace(voxel, chunk.getVoxel({x, y - 1, z})))
+                    {
+                        mesh.addVoxelFace(BOTTOM_FACE, p, voxelPosition,
+                                          voxData.textureBottom);
+                    }
 
-                // Bottom chunk face
-                if (shouldMakeFace(voxel, chunk.getVoxel({x, y - 1, 0})))
-                {
-                    mesh.addVoxelFace(BOTTOM_FACE, p, voxelPosition,
-                                      voxData.textureBottom);
-                }
-
-                // Top chunk face
-                if (shouldMakeFace(voxel, chunk.getVoxel({x, y + 1, 0})))
-                {
-                    mesh.addVoxelFace(TOP_FACE, p, voxelPosition, voxData.textureTop);
+                    // Top chunk face
+                    if (shouldMakeFace(voxel, chunk.getVoxel({x, y + 1, z})))
+                    {
+                        mesh.addVoxelFace(TOP_FACE, p, voxelPosition, voxData.textureTop);
+                    }
                 }
             }
         }
     }
-
     return mesh;
 }
 
@@ -228,14 +232,13 @@ ChunkMesh createGreedyChunkMeshv2(const Chunk& chunk)
                          currPos[sweepDirA]++) {
                         for (currPos[sweepDirB] = start[sweepDirB];
                              currPos[sweepDirB] < CHUNK_SIZE &&
-                             chunk.compareStep(start, currPos, sliceDir, isBackFace) &&
-                             !mask.at(maskIdx(currPos[sweepDirA], currPos[sweepDirB]));
-                             currPos[sweepDirB]++) {
+                             chunk.compareStep(start, currPos, sliceDir, isBackFace)
+&& !mask.at(maskIdx(currPos[sweepDirA], currPos[sweepDirB])); currPos[sweepDirB]++) {
                         }
 
                         // If we didn't reach the end then its not a good add.
-                        if (currPos[sweepDirB] - start[sweepDirB] < quadSize[sweepDirB]) {
-                            break;
+                        if (currPos[sweepDirB] - start[sweepDirB] <
+quadSize[sweepDirB]) { break;
                         }
                         else {
                             currPos[sweepDirB] = start[sweepDirB];
@@ -307,8 +310,8 @@ ChunkMesh createGreedyChunkMeshv2(const Chunk& chunk)
                     // Finally, add the face to the mask so they aren't repeated
                     for (int y = 0; y < quadSize[sweepDirA]; y++) {
                         for (int x = 0; x < quadSize[sweepDirB]; x++) {
-                            mask.at(maskIdx(start[sweepDirA] + y, start[sweepDirB] + x)) =
-                                true;
+                            mask.at(maskIdx(start[sweepDirA] + y, start[sweepDirB] +
+x)) = true;
                         }
                     }
                 }
