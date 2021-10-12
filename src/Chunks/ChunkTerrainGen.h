@@ -9,11 +9,8 @@ struct TerrainGenOptions
     float smoothness = 500;
     float roughness = 0.58;
     float offset = 0;
-
     int seed;
-    int useGreedyMeshing = true;
 };
 
-std::vector<ChunkPosition> createChunkTerrain(ChunkMap& chunkmap, int chunkX, int chunkZ,
-                                              int worldSize,
-                                              const TerrainGenOptions& TerrainGenOptions);
+void createChunkTerrain(Chunk& chunk, int chunkX, int chunkY, int worldWidth,
+                        int worldHeight, const TerrainGenOptions& terrainGenOptions);

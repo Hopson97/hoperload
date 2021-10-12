@@ -1,6 +1,7 @@
 #include "Game.h"
 
 #include "Chunks/ChunkMesh.h"
+#include "Chunks/ChunkTerrainGen.h"
 #include "Chunks/Voxels.h"
 #include "Utility.h"
 
@@ -21,49 +22,16 @@ Game::Game()
     m_chunkTextures.create(16, 16);
     initVoxelSystem(m_chunkTextures);
 
-    int height = 4;
-    int heightInVoxels = (height * CHUNK_SIZE) - 1;
-    m_cameraTransform = {{50, heightInVoxels, 50}, {0, 270, 0}};
+    int worldHeight = 4;
+    int worldWidth = 4;
+    m_cameraTransform = {{50, worldHeight * CHUNK_SIZE, 50}, {0, 270, 0}};
 
     for (int cx = 0; cx < 2; cx++)
     {
         for (int cy = 0; cy < 4; cy++)
         {
             Chunk& c = m_chunkMap.addChunk({cx, cy});
-
-            for (int y = 0; y < CHUNK_SIZE; y++)
-            {
-                for (int x = 0; x < CHUNK_SIZE; x++)
-                {
-                    auto h = CHUNK_SIZE * cy + y;
-                    if (h == heightInVoxels)
-                    {
-                        c.setVoxel({x, y, 0}, GRASS);
-                        c.setVoxel({x, y, 1}, GRASS);
-                    }
-                    else if (h > heightInVoxels - 3)
-                    {
-                        c.setVoxel({x, y, 0}, DIRT);
-                        c.setVoxel({x, y, 1}, DIRT);
-                    }
-                    else if (h > heightInVoxels - CHUNK_SIZE)
-                    {
-                        c.setVoxel({x, y, 0}, DIRT);
-                        if (rand() % 64 < 40)
-                        {
-                            c.setVoxel({x, y, 1}, DIRT);
-                        }
-                    }
-                    else
-                    {
-                        c.setVoxel({x, y, 0}, STONE);
-                        if (rand() % 64 < 40)
-                        {
-                            c.setVoxel({x, y, 1}, STONE);
-                        }
-                    }
-                }
-            }
+            createChunkTerrain(c, cx, cy, worldWidth, worldHeight, {});
 
             ChunkMesh mesh = createGreedyChunkMesh(c);
             VertexArray chunkVertexArray;
