@@ -29,6 +29,13 @@ struct ChunkPositionHash
     }
 };
 
+struct VoxelInstance
+{
+    VoxelID kind = 0;
+    uint8_t sunLight = 0;
+    uint8_t torchLight = 0;
+};
+
 class Chunk
 {
   public:
@@ -44,6 +51,9 @@ class Chunk
     void qSetVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId);
     VoxelID qGetVoxel(const VoxelPosition& voxelPosition) const;
 
+    void setSunlight(const VoxelPosition& voxelPosition, uint8_t light);
+    uint8_t getSunlight(const VoxelPosition& voxelPosition) const;
+
     ChunkPosition position() const { return m_position; };
 
     bool isFaceVisible(VoxelPosition pos, int axis, bool isBackFace) const;
@@ -55,7 +65,7 @@ class Chunk
     ChunkMap* m_pChunkMap;
     ChunkPosition m_position;
 
-    std::array<VoxelID, CHUNK_VOLUME> m_voxels{0};
+    std::array<VoxelInstance, CHUNK_VOLUME> m_voxels;
 };
 
 class ChunkMap

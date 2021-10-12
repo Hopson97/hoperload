@@ -5,6 +5,61 @@
 #include "Chunks/Voxels.h"
 #include "Utility.h"
 
+void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
+{
+    chunk.setSunlight(position, lightLevel);
+
+    auto v = chunk.qGetVoxel(position);
+    if (v == AIR)
+    {
+
+        lightLevel -= 1;
+    }
+    else if (v == WATER)
+    {
+        lightLevel -= 2;
+    }
+    else
+    {
+        lightLevel -= 4;
+    }
+
+    if (lightLevel <= 0)
+    {
+        return;
+    }
+
+    if (chunk.getSunlight({position.x + 1, position.y, position.z}) < lightLevel)
+    {
+        floodLights(chunk, {position.x + 1, position.y, position.z}, lightLevel);
+    }
+
+    if (chunk.getSunlight({position.x - 1, position.y, position.z}) < lightLevel)
+    {
+        floodLights(chunk, {position.x - 1, position.y, position.z}, lightLevel);
+    }
+
+    if (chunk.getSunlight({position.x, position.y + 1, position.z}) < lightLevel)
+    {
+        floodLights(chunk, {position.x, position.y + 1, position.z}, lightLevel);
+    }
+
+    if (chunk.getSunlight({position.x, position.y - 1, position.z}) < lightLevel)
+    {
+        floodLights(chunk, {position.x, position.y - 1, position.z}, lightLevel);
+    }
+
+    if (chunk.getSunlight({position.x, position.y, position.z + 1}) < lightLevel)
+    {
+        floodLights(chunk, {position.x, position.y, position.z + 1}, lightLevel);
+    }
+
+    if (chunk.getSunlight({position.x, position.y, position.z - 1}) < lightLevel)
+    {
+        floodLights(chunk, {position.x, position.y, position.z - 1}, lightLevel);
+    }
+}
+
 Game::Game()
 {
     m_sceneShader.loadFromFile("SceneVertex.glsl", "SceneFragment.glsl");
@@ -30,10 +85,21 @@ Game::Game()
     {
         for (int cy = 0; cy < 4; cy++)
         {
-            Chunk& c = m_chunkMap.addChunk({cx, cy});
-            createChunkTerrain(c, cx, cy, worldWidth, worldHeight, {});
+            Chunk& chunk = m_chunkMap.addChunk({cx, cy});
+            createChunkTerrain(chunk, cx, cy, worldWidth, worldHeight, {});
 
-            ChunkMesh mesh = createGreedyChunkMesh(c);
+            for (int x = 0; x < CHUNK_SIZE; x++)
+            {
+                for (int y = 0; y < CHUNK_SIZE; y++)
+                {
+                    if (chunk.qGetVoxel({x, y, 0}) == AIR)
+                    {
+                        floodLights(chunk, {x, y, 1}, 15);
+                    }
+                }
+            }
+
+            ChunkMesh mesh = createGreedyChunkMesh(chunk);
             VertexArray chunkVertexArray;
             chunkVertexArray.bufferMesh(mesh);
             int verts = mesh.vertices.size();

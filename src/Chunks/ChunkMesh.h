@@ -32,7 +32,7 @@ struct ChunkMesh
     GLsizei indicesCount = 0;
 
     void addVoxelFace(const VoxelMeshFace& face, const ChunkPosition& chunkPos,
-                      const VoxelPosition& position, GLfloat textureId);
+                      const VoxelPosition& position, GLfloat textureId, float lightValue);
 };
 
 ChunkMesh createGreedyChunkMesh(const Chunk& chunk);

@@ -11,7 +11,6 @@ namespace
     {
         int x = position.x;
         int y = position.y;
-        int z = position.z;
         return {x < 0 ? ((x - CHUNK_SIZE) / CHUNK_SIZE) : (x / CHUNK_SIZE),
                 y < 0 ? ((y - CHUNK_SIZE) / CHUNK_SIZE) : (y / CHUNK_SIZE)};
     }
@@ -72,8 +71,7 @@ void Chunk::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
     if (voxelPositionOutOfChunkBounds(voxelPosition))
     {
-        return m_pChunkMap->setVoxel(toGlobalVoxelPosition(voxelPosition, m_position),
-                                     voxelId);
+        m_pChunkMap->setVoxel(toGlobalVoxelPosition(voxelPosition, m_position), voxelId);
     }
     qSetVoxel(voxelPosition, voxelId);
 }
@@ -90,13 +88,31 @@ VoxelID Chunk::getVoxel(const VoxelPosition& voxelPosition) const
 void Chunk::qSetVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
     assert(!voxelPositionOutOfChunkBounds(voxelPosition));
-    m_voxels[toLocalVoxelIndex(voxelPosition)] = voxelId;
+    m_voxels[toLocalVoxelIndex(voxelPosition)].kind = voxelId;
 }
 
 VoxelID Chunk::qGetVoxel(const VoxelPosition& voxelPosition) const
 {
     assert(!voxelPositionOutOfChunkBounds(voxelPosition));
-    return m_voxels[toLocalVoxelIndex(voxelPosition)];
+    return m_voxels[toLocalVoxelIndex(voxelPosition)].kind;
+}
+
+void Chunk::setSunlight(const VoxelPosition& voxelPosition, uint8_t light)
+{
+    if (voxelPositionOutOfChunkBounds(voxelPosition))
+    {
+        return;
+    }
+    m_voxels[toLocalVoxelIndex(voxelPosition)].sunLight = light;
+}
+
+uint8_t Chunk::getSunlight(const VoxelPosition& voxelPosition) const
+{
+    if (voxelPositionOutOfChunkBounds(voxelPosition))
+    {
+        return 15;
+    }
+    return m_voxels[toLocalVoxelIndex(voxelPosition)].sunLight;
 }
 
 bool Chunk::isFaceVisible(VoxelPosition pos, int axis, bool isBackFace) const

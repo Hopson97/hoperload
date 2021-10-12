@@ -4,7 +4,7 @@
 void createChunkTerrain(Chunk& chunk, int chunkX, int chunkY, int worldWidth,
                         int worldHeight, const TerrainGenOptions& terrainGenOptions)
 {
-    int heightInVoxels = (worldHeight * CHUNK_SIZE) - 1;
+    int BASE_HEIGHT = worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2;
 
     for (int y = 0; y < CHUNK_SIZE; y++)
     {
@@ -13,21 +13,28 @@ void createChunkTerrain(Chunk& chunk, int chunkX, int chunkY, int worldWidth,
         for (int x = 0; x < CHUNK_SIZE; x++)
         {
             // Top level
-            if (voxelHeight == heightInVoxels)
+            if (voxelHeight > BASE_HEIGHT)
+            {
+                chunk.setVoxel({x, y, 0}, AIR);
+                chunk.setVoxel({x, y, 1}, AIR);
+            }
+
+            // Base
+            else if (voxelHeight == BASE_HEIGHT)
             {
                 chunk.setVoxel({x, y, 0}, GRASS);
                 chunk.setVoxel({x, y, 1}, GRASS);
             }
 
             // Upper dirt layer
-            else if (voxelHeight > heightInVoxels - 3)
+            else if (voxelHeight > BASE_HEIGHT - 3)
             {
                 chunk.setVoxel({x, y, 0}, DIRT);
                 chunk.setVoxel({x, y, 1}, DIRT);
             }
 
             // Lower dirt layer
-            else if (voxelHeight > heightInVoxels - CHUNK_SIZE)
+            else if (voxelHeight > BASE_HEIGHT - CHUNK_SIZE)
             {
                 chunk.setVoxel({x, y, 0}, DIRT);
                 if (rand() % 64 < 40)
