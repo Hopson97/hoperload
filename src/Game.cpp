@@ -6,8 +6,8 @@
 #include "Chunks/Voxels.h"
 #include "Utility.h"
 
-int worldHeight = 4;
-int worldWidth = 4;
+int worldHeight = 16;
+int worldWidth = 8;
 
 int toIndex(int x, int y) { return x + y * CHUNK_SIZE; }
 
@@ -69,10 +69,10 @@ Game::Game()
                          {0, 270, 0}};
     m_player = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2 + 1, 1}, {0, 0, 0}};
 
-    for (int cy = 0; cy < 4; cy++)
+    for (int cy = 0; cy < worldHeight; cy++)
     {
 
-        for (int cx = 0; cx < 2; cx++)
+        for (int cx = 0; cx < worldWidth; cx++)
         {
             Chunk& chunk = m_chunkMap.addChunk({cx, cy});
             createChunkTerrain(chunk, cx, cy, worldWidth, worldHeight, {});
@@ -96,9 +96,21 @@ Game::Game()
     }
 }
 
+bool freecam = false;
 void Game::onEvent(const sf::Event& e) 
 {
+    switch (e.type)
+    {
+    case sf::Event::KeyReleased:
+        if (e.key.code == sf::Keyboard::F) {
+            freecam = !freecam;
+        }
+        /* code */
+        break;
     
+    default:
+        break;
+    }
 }
 
 void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMouseActive)
@@ -106,79 +118,89 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
     Transform& camera = m_cameraTransform;
 
     float PLAYER_SPEED = 0.5f;
-    // if (keyboard.isKeyDown(sf::Keyboard::LControl))
-    //{
-    //    PLAYER_SPEED = 5.0f;
-    //}
-    // if (keyboard.isKeyDown(sf::Keyboard::W))
-    //{
-    //    camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
-    //}
-    // else if (keyboard.isKeyDown(sf::Keyboard::S))
-    //{
-    //    camera.position += backwardsVector(camera.rotation) * PLAYER_SPEED;
-    //}
-    // if (keyboard.isKeyDown(sf::Keyboard::A))
-    //{
-    //    camera.position += leftVector(camera.rotation) * PLAYER_SPEED;
-    //}
-    // else if (keyboard.isKeyDown(sf::Keyboard::D))
-    //{
-    //    camera.position += rightVector(camera.rotation) * PLAYER_SPEED;
-    //}
 
-    if (keyboard.isKeyDown(sf::Keyboard::W))
+    if (freecam)
     {
-        m_playerVelocity.y += PLAYER_SPEED;
-    }
-    else if (keyboard.isKeyDown(sf::Keyboard::S))
-    {
-        m_playerVelocity.y -= PLAYER_SPEED;
-    }
-    if (keyboard.isKeyDown(sf::Keyboard::A))
-    {
-        m_playerVelocity.x -= PLAYER_SPEED;
-    }
-    else if (keyboard.isKeyDown(sf::Keyboard::D))
-    {
-        m_playerVelocity.x += PLAYER_SPEED;
-    }
-
-    if (keyboard.isKeyDown(sf::Keyboard::Space))
-    {
-        for (int y = -1; y <= 1; y++)
+        if (keyboard.isKeyDown(sf::Keyboard::LControl))
         {
-            for (int x = -1; x <= 1; x++)
+            PLAYER_SPEED = 5.0f;
+        }
+        if (keyboard.isKeyDown(sf::Keyboard::W))
+        {
+            camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
+        }
+        else if (keyboard.isKeyDown(sf::Keyboard::S))
+        {
+            camera.position += backwardsVector(camera.rotation) * PLAYER_SPEED;
+        }
+        if (keyboard.isKeyDown(sf::Keyboard::A))
+        {
+            camera.position += leftVector(camera.rotation) * PLAYER_SPEED;
+        }
+        else if (keyboard.isKeyDown(sf::Keyboard::D))
+        {
+            camera.position += rightVector(camera.rotation) * PLAYER_SPEED;
+        }
+
+        if (!isMouseActive)
+        {
+            return;
+        }
+        static auto lastMousePosition = sf::Mouse::getPosition(window);
+        auto change = sf::Mouse::getPosition(window) - lastMousePosition;
+        camera.rotation.x -= static_cast<float>(change.y * 0.5);
+        camera.rotation.y += static_cast<float>(change.x * 0.5);
+        sf::Mouse::setPosition({(int)window.getSize().x / 2, (int)window.getSize().y / 2},
+                               window);
+        lastMousePosition.x = (int)window.getSize().x / 2;
+        lastMousePosition.y = (int)window.getSize().y / 2;
+
+        camera.rotation.x = glm::clamp(camera.rotation.x, -89.9f, 89.9f);
+        camera.rotation.y = (int)camera.rotation.y % 360;
+    }
+    else
+    {
+
+        if (keyboard.isKeyDown(sf::Keyboard::W))
+        {
+            m_playerVelocity.y += PLAYER_SPEED;
+        }
+        else if (keyboard.isKeyDown(sf::Keyboard::S))
+        {
+            m_playerVelocity.y -= PLAYER_SPEED;
+        }
+        if (keyboard.isKeyDown(sf::Keyboard::A))
+        {
+            m_playerVelocity.x -= PLAYER_SPEED;
+        }
+        else if (keyboard.isKeyDown(sf::Keyboard::D))
+        {
+            m_playerVelocity.x += PLAYER_SPEED;
+        }
+
+        if (keyboard.isKeyDown(sf::Keyboard::Space))
+        {
+            for (int y = -1; y <= 1; y++)
             {
-                breakBlock(m_player.position.x + x, m_player.position.y + y);
+                for (int x = -1; x <= 1; x++)
+                {
+                    breakBlock(m_player.position.x + x, m_player.position.y + y);
+                }
             }
         }
     }
-
-    // if (!isMouseActive)
-    {
-        return;
-    }
-    static auto lastMousePosition = sf::Mouse::getPosition(window);
-    auto change = sf::Mouse::getPosition(window) - lastMousePosition;
-    camera.rotation.x -= static_cast<float>(change.y * 0.5);
-    camera.rotation.y += static_cast<float>(change.x * 0.5);
-    sf::Mouse::setPosition({(int)window.getSize().x / 2, (int)window.getSize().y / 2},
-                           window);
-    lastMousePosition.x = (int)window.getSize().x / 2;
-    lastMousePosition.y = (int)window.getSize().y / 2;
-
-    camera.rotation.x = glm::clamp(camera.rotation.x, -89.9f, 89.9f);
-    camera.rotation.y = (int)camera.rotation.y % 360;
 }
 
 void Game::onUpdate(const sf::Time& time)
 {
-    m_player.position += m_playerVelocity * time.asSeconds();
-    m_playerVelocity *= 0.98;
+    if (!freecam)
+    {
+        m_player.position += m_playerVelocity * time.asSeconds();
+        m_playerVelocity *= 0.98;
 
-    m_cameraTransform.position.x = m_player.position.x;
-    m_cameraTransform.position.y = m_player.position.y;
+    m_cameraTransform = {{m_player.position.x, m_player.position.y, 10},
+                         {0, 270, 0}};
+    }
 }
 
 void Game::breakBlock(int x, int y)

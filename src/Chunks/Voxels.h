@@ -13,6 +13,8 @@ enum VoxelType : uint16_t
     STONE = 4,
     SAND = 5,
 
+    TEST_TORCH = 6,
+
     NUM_VOXELS
 };
 
@@ -20,12 +22,13 @@ struct Voxel
 {
     Voxel() = default;
     Voxel(const char* name, GLuint textureTop, GLuint textureSide, GLuint textureBottom,
-          bool isTransparent)
+          bool isTransparent, bool isLight = false)
         : name{name}
         , textureTop{textureTop}
         , textureSide{textureSide}
         , textureBottom{textureBottom}
         , isTransparent(isTransparent)
+        , isLight(isLight)
     {
     }
     const char* name;
@@ -34,6 +37,7 @@ struct Voxel
     GLuint textureBottom;
 
     bool isTransparent;
+    bool isLight;
 };
 
 void initVoxelSystem(TextureArray2D& textureArray);

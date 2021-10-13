@@ -67,6 +67,24 @@ uint8_t Chunk::getSunlight(const VoxelPosition& voxelPosition) const
     return m_voxels[localVoxelToLocalIndex(voxelPosition)].sunLight;
 }
 
+void Chunk::setTorchlight(const VoxelPosition& voxelPosition, uint8_t light)
+{
+    if (voxelPositionOutOfChunkBounds(voxelPosition))
+    {
+        return;
+    }
+    m_voxels[localVoxelToLocalIndex(voxelPosition)].torchLight = light;
+}
+
+uint8_t Chunk::getTorchlight(const VoxelPosition& voxelPosition) const
+{
+    if (voxelPositionOutOfChunkBounds(voxelPosition))
+    {
+        return 15;
+    }
+    return m_voxels[localVoxelToLocalIndex(voxelPosition)].torchLight;
+}
+
 bool Chunk::isFaceVisible(VoxelPosition pos, int axis, bool isBackFace) const
 {
     // Convert the block position to the adjacent voxel pos that is currently
