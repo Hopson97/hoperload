@@ -28,7 +28,7 @@ void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
     }
     else
     {
-        lightLevel -= 6;
+        lightLevel -= 5;
     }
 
     if (lightLevel <= 0)
@@ -96,11 +96,16 @@ Game::Game()
     }
 }
 
+void Game::onEvent(const sf::Event& e) 
+{
+    
+}
+
 void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMouseActive)
 {
     Transform& camera = m_cameraTransform;
 
-    float PLAYER_SPEED = 0.1f;
+    float PLAYER_SPEED = 0.5f;
     // if (keyboard.isKeyDown(sf::Keyboard::LControl))
     //{
     //    PLAYER_SPEED = 5.0f;
@@ -124,23 +129,20 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 
     if (keyboard.isKeyDown(sf::Keyboard::W))
     {
-        m_player.position.y += PLAYER_SPEED;
+        m_playerVelocity.y += PLAYER_SPEED;
     }
     else if (keyboard.isKeyDown(sf::Keyboard::S))
     {
-        m_player.position.y -= PLAYER_SPEED;
+        m_playerVelocity.y -= PLAYER_SPEED;
     }
     if (keyboard.isKeyDown(sf::Keyboard::A))
     {
-        m_player.position.x -= PLAYER_SPEED;
+        m_playerVelocity.x -= PLAYER_SPEED;
     }
     else if (keyboard.isKeyDown(sf::Keyboard::D))
     {
-        m_player.position.x += PLAYER_SPEED;
+        m_playerVelocity.x += PLAYER_SPEED;
     }
-
-    m_cameraTransform.position.x = m_player.position.x;
-    m_cameraTransform.position.y = m_player.position.y;
 
     if (keyboard.isKeyDown(sf::Keyboard::Space))
     {
@@ -170,7 +172,14 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
     camera.rotation.y = (int)camera.rotation.y % 360;
 }
 
-void Game::onUpdate() {}
+void Game::onUpdate(const sf::Time& time)
+{
+    m_player.position += m_playerVelocity * time.asSeconds();
+    m_playerVelocity *= 0.98;
+
+    m_cameraTransform.position.x = m_player.position.x;
+    m_cameraTransform.position.y = m_player.position.y;
+}
 
 void Game::breakBlock(int x, int y)
 {
@@ -189,6 +198,7 @@ void Game::breakBlock(int x, int y)
     ChunkMesh mesh = createGreedyChunkMesh(chunk);
     VertexArray chunkVertexArray;
     chunkVertexArray.bufferMesh(mesh);
+    m_chunkRendersList[chunk.position()].~VertexArray();
     m_chunkRendersList[chunk.position()] = std::move(chunkVertexArray);
 }
 

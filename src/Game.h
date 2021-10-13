@@ -21,12 +21,10 @@ class Game
   public:
     Game();
 
+    void onEvent(const sf::Event& e);
     void onInput(const Keyboard& keyboard, const sf::Window& window, bool isMouseActive);
-
-    void onUpdate();
-
+    void onUpdate(const sf::Time& time);
     void onRender();
-
     void onGUI();
 
   private:
@@ -40,6 +38,7 @@ class Game
     ViewFrustum m_frustum;
     Transform m_cameraTransform;
     Transform m_player;
+    glm::vec3 m_playerVelocity;
 
     glm::mat4 m_projectionMatrix;
 

@@ -14,10 +14,18 @@ int main()
         return 1;
     }
     window.setFramerateLimit(60);
+    window.setKeyRepeatEnabled(false);
+
     guiInit(window);
 
-    Game game;
+    // Time step vars, 60 ticks per second
+    const sf::Time timePerUpdate = sf::seconds(1.0f / 60.0f);
+    sf::Clock timer;
+    sf::Time lastTime = sf::Time::Zero;
+    sf::Time lag = sf::Time::Zero;
+    sf::Clock updateClock;
 
+    Game game;
     Keyboard keyboard;
     while (window.isOpen())
     {
@@ -27,6 +35,7 @@ int main()
         {
             keyboard.update(e);
             guiProcessEvent(e);
+            game.onEvent(e);
             if (e.type == sf::Event::KeyReleased)
             {
                 if (e.key.code == sf::Keyboard::Escape)
@@ -41,8 +50,20 @@ int main()
             }
         }
 
+        // Get times
+        sf::Time dt = updateClock.restart();
+        sf::Time time = timer.getElapsedTime();
+        sf::Time elapsed = time - lastTime;
+        lastTime = time;
+        lag += elapsed;
         game.onInput(keyboard, window, isMouseActive);
-        game.onUpdate();
+
+        // Fixed time update
+        while (lag >= timePerUpdate)
+        {
+            lag -= timePerUpdate;
+            game.onUpdate(elapsed);
+        }
 
         glEnable(GL_DEPTH_TEST);
         game.onRender();
