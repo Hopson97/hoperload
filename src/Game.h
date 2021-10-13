@@ -29,9 +29,8 @@ class Game
 
     void onGUI();
 
-
   private:
-    void breakBlock();
+    void breakBlock(int x, int y);
     void renderScene(const glm::mat4& projectionViewMatrix);
 
     Shader m_sceneShader;

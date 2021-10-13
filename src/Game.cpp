@@ -27,7 +27,7 @@ void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
     }
     else
     {
-        lightLevel -= 4;
+        lightLevel -= 6;
     }
 
     if (lightLevel <= 0)
@@ -38,7 +38,7 @@ void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
     auto tryFlood = [&](const glm::ivec3 offset) {
         auto newFloodPosition = position + offset;
 
-        if (chunk.getSunlight(newFloodPosition) < lightLevel)
+        if (chunk.getSunlight(newFloodPosition) <= lightLevel)
         {
             floodLights(chunk, newFloodPosition, lightLevel);
         }
@@ -59,12 +59,12 @@ Game::Game()
     m_voxelShader.loadFromFile("TerrainVertex.glsl", "TerrainFragment.glsl");
 
     float aspect = (float)WIDTH / (float)HEIGHT;
-    m_projectionMatrix = createProjectionMatrix(aspect, 120.0f);
+    m_projectionMatrix = createProjectionMatrix(aspect, 110.0f);
 
     m_chunkTextures.create(16, 16);
     initVoxelSystem(m_chunkTextures);
 
-    m_cameraTransform = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2, 5},
+    m_cameraTransform = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2, 10},
                          {0, 270, 0}};
     m_playerPosition = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2 + 1, 1},
                         {0, 0, 0}};
@@ -139,9 +139,19 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
         m_playerPosition.position.x += PLAYER_SPEED;
     }
 
+    m_cameraTransform.position.x = m_playerPosition.position.x;
+    m_cameraTransform.position.y = m_playerPosition.position.y;
+
     if (keyboard.isKeyDown(sf::Keyboard::Space))
     {
-        breakBlock();
+        for (int y = -1; y <= 1; y++)
+        {
+            for (int x = -1; x <= 1; x++)
+            {
+                breakBlock(m_playerPosition.position.x + x,
+                           m_playerPosition.position.y + y);
+            }
+        }
     }
 
     // if (!isMouseActive)
@@ -163,25 +173,22 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 
 void Game::onUpdate() {}
 
-void Game::breakBlock()
+void Game::breakBlock(int x, int y)
 {
     // Convert player position to voxel position
-    VoxelPosition vp = {(int)m_playerPosition.position.x % CHUNK_SIZE,
-                        (int)m_playerPosition.position.y % CHUNK_SIZE, 1};
+    VoxelPosition localVoxel = {x % CHUNK_SIZE, y % CHUNK_SIZE, 1};
 
     // Convert to chunk position
-    ChunkPosition cp = {
-        m_playerPosition.position.x / CHUNK_SIZE,
-        m_playerPosition.position.y / CHUNK_SIZE,
+    ChunkPosition localChunk = {
+        x / CHUNK_SIZE,
+        y / CHUNK_SIZE,
     };
 
     // Get the global voxel position
-    VoxelPosition gp = {vp.x + cp.x * CHUNK_SIZE, vp.y + cp.y * CHUNK_SIZE, 1};
+    VoxelPosition globalVoxel = {localVoxel.x + localChunk.x * CHUNK_SIZE,
+                                 localVoxel.y + localChunk.y * CHUNK_SIZE, 1};
 
-    std::cout << "BREAKING AT " << cp.x << " " << cp.y << "\n";
-    std::cout << "BREAKING AT " << gp.x << " " << gp.y << "\n\n";
-
-    auto& chunk = m_chunkMap.setVoxel(gp, AIR);
+    auto& chunk = m_chunkMap.setVoxel(globalVoxel, AIR);
     for (int x = 0; x < CHUNK_SIZE; x++)
     {
         for (int y = 0; y < CHUNK_SIZE; y++)
