@@ -226,14 +226,14 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix)
     // Normal stuff
     m_sceneShader.bind();
     m_sceneShader.set("projectionViewMatrix", projectionViewMatrix);
-    m_sceneShader.set("isLight", false);
-    m_sceneShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
     m_sceneShader.set("eyePosition", m_cameraTransform.position);
 
     glEnable(GL_CULL_FACE);
+
+    m_sceneShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
+
     auto lightModel = createModelMatrix(m_playerPosition);
     m_sceneShader.set("modelMatrix", lightModel);
-    m_sceneShader.set("isLight", true);
     m_lightCube.getRendable().drawElements();
 
     // Chunks

@@ -12,12 +12,10 @@ uniform vec3 lightColour;
 uniform vec3 lightPosition;
 uniform vec3 eyePosition;
 
-uniform bool isLight;
 
 void main()
 {
     outColour = texture(diffuseTexture, passTextureCoord);
-    if (!isLight) {
         vec3 ambient = 0.1 * lightColour;
 
         vec3 normal = normalize(passNormal);
@@ -34,5 +32,4 @@ void main()
 
         vec4 result = vec4(ambient + specular + diffuse, 1.0); 
         outColour *= result;
-    }
 }

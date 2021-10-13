@@ -1,63 +1,13 @@
 #include "Chunk.h"
+#include "Conversions.h"
 #include "Voxels.h"
+
 namespace
 {
-    int toLocalVoxelIndex(const VoxelPosition& position)
+    int localVoxelToLocalIndex(const VoxelPosition& position)
     {
         return position.y * (CHUNK_AREA) + position.z * CHUNK_SIZE + position.x;
     }
-
-    ChunkPosition toChunkPosition(const VoxelPosition& position)
-    {
-        int x = position.x;
-        int y = position.y;
-        return {x < 0 ? ((x - CHUNK_SIZE) / CHUNK_SIZE) : (x / CHUNK_SIZE),
-                y < 0 ? ((y - CHUNK_SIZE) / CHUNK_SIZE) : (y / CHUNK_SIZE)};
-    }
-
-    // ChunkPosition toChunkPosition(float xp, float yp, float zp)
-    //{
-    //    int x = static_cast<int>(xp);
-    //    int y = static_cast<int>(yp);
-    //    int z = static_cast<int>(zp);
-    //    return toChunkPosition({x, y, z});
-    //}
-
-    VoxelPosition toLocalVoxelPosition(const VoxelPosition& position)
-    {
-        // Deals with negative coordinates too
-        return {(CHUNK_SIZE + (position.x % CHUNK_SIZE)) % CHUNK_SIZE,
-                (CHUNK_SIZE + (position.y % CHUNK_SIZE)) % CHUNK_SIZE,
-                (CHUNK_SIZE + (position.z % CHUNK_SIZE)) % CHUNK_SIZE};
-    }
-
-    // VoxelPosition toLocalVoxelPosition(float xp, float yp, float zp)
-    //{
-    //    int x = static_cast<int>(xp);
-    //    int y = static_cast<int>(yp);
-    //    int z = static_cast<int>(zp);
-    //    return toLocalVoxelPosition({x, y, z});
-    //}
-
-    VoxelPosition toGlobalVoxelPosition(const VoxelPosition& voxelPosition,
-                                        const ChunkPosition& localChunkPosition)
-    {
-        return {localChunkPosition.x * CHUNK_SIZE + voxelPosition.x,
-                localChunkPosition.y * CHUNK_SIZE + voxelPosition.y, voxelPosition.z};
-    }
-
-    // VoxelPosition toVoxelPosition(const glm::vec3& vec)
-    //{
-    //    auto x = static_cast<int>(std::floor(vec.x));
-    //    auto y = static_cast<int>(std::floor(vec.y));
-    //    auto z = static_cast<int>(std::floor(vec.z));
-    //    return {x, y, z};
-    //}
-
-    // ChunkPosition worldToChunkPosition(const glm::vec3& position)
-    //{
-    //    return toChunkPosition(toVoxelPosition(position));
-    //}
 
     bool voxelPositionOutOfChunkBounds(const VoxelPosition& voxelPosition)
     {
@@ -71,7 +21,8 @@ void Chunk::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
     if (voxelPositionOutOfChunkBounds(voxelPosition))
     {
-        m_pChunkMap->setVoxel(toGlobalVoxelPosition(voxelPosition, m_position), voxelId);
+        m_pChunkMap->setVoxel(localToGlobalVoxelPosition(voxelPosition, m_position),
+                              voxelId);
     }
     qSetVoxel(voxelPosition, voxelId);
 }
@@ -80,7 +31,8 @@ VoxelID Chunk::getVoxel(const VoxelPosition& voxelPosition) const
 {
     if (voxelPositionOutOfChunkBounds(voxelPosition))
     {
-        return m_pChunkMap->getVoxel(toGlobalVoxelPosition(voxelPosition, m_position));
+        return m_pChunkMap->getVoxel(
+            localToGlobalVoxelPosition(voxelPosition, m_position));
     }
     return qGetVoxel(voxelPosition);
 }
@@ -88,13 +40,13 @@ VoxelID Chunk::getVoxel(const VoxelPosition& voxelPosition) const
 void Chunk::qSetVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
     assert(!voxelPositionOutOfChunkBounds(voxelPosition));
-    m_voxels[toLocalVoxelIndex(voxelPosition)].kind = voxelId;
+    m_voxels[localVoxelToLocalIndex(voxelPosition)].kind = voxelId;
 }
 
 VoxelID Chunk::qGetVoxel(const VoxelPosition& voxelPosition) const
 {
     assert(!voxelPositionOutOfChunkBounds(voxelPosition));
-    return m_voxels[toLocalVoxelIndex(voxelPosition)].kind;
+    return m_voxels[localVoxelToLocalIndex(voxelPosition)].kind;
 }
 
 void Chunk::setSunlight(const VoxelPosition& voxelPosition, uint8_t light)
@@ -103,7 +55,7 @@ void Chunk::setSunlight(const VoxelPosition& voxelPosition, uint8_t light)
     {
         return;
     }
-    m_voxels[toLocalVoxelIndex(voxelPosition)].sunLight = light;
+    m_voxels[localVoxelToLocalIndex(voxelPosition)].sunLight = light;
 }
 
 uint8_t Chunk::getSunlight(const VoxelPosition& voxelPosition) const
@@ -112,7 +64,7 @@ uint8_t Chunk::getSunlight(const VoxelPosition& voxelPosition) const
     {
         return 15;
     }
-    return m_voxels[toLocalVoxelIndex(voxelPosition)].sunLight;
+    return m_voxels[localVoxelToLocalIndex(voxelPosition)].sunLight;
 }
 
 bool Chunk::isFaceVisible(VoxelPosition pos, int axis, bool isBackFace) const
@@ -139,9 +91,9 @@ bool Chunk::compareStep(VoxelPosition a, VoxelPosition b, int dir, bool isBackFa
 ///
 Chunk& ChunkMap::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
-    auto chunkPosition = toChunkPosition(voxelPosition);
+    auto chunkPosition = worldToChunkPosition(voxelPosition);
     auto itr = m_chunks.find(chunkPosition);
-    auto local = toLocalVoxelPosition(voxelPosition);
+    auto local = globalVoxelToLocalVoxelPosition(voxelPosition);
     if (itr != m_chunks.cend())
     {
         itr->second.qSetVoxel(local, voxelId);
@@ -157,13 +109,13 @@ Chunk& ChunkMap::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 
 VoxelID ChunkMap::getVoxel(const VoxelPosition& voxelPosition) const
 {
-    auto chunkPosition = toChunkPosition(voxelPosition);
+    auto chunkPosition = worldToChunkPosition(voxelPosition);
     auto itr = m_chunks.find(chunkPosition);
     if (itr == m_chunks.cend())
     {
         return 0;
     }
-    return itr->second.qGetVoxel(toLocalVoxelPosition(voxelPosition));
+    return itr->second.qGetVoxel(globalVoxelToLocalVoxelPosition(voxelPosition));
 }
 
 const Chunk& ChunkMap::getChunk(const ChunkPosition& chunk) const
