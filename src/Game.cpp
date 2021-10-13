@@ -5,6 +5,11 @@
 #include "Chunks/Voxels.h"
 #include "Utility.h"
 
+int worldHeight = 4;
+int worldWidth = 4;
+
+int toIndex(int x, int y) { return x + y * CHUNK_SIZE; }
+
 void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
 {
     chunk.setSunlight(position, lightLevel);
@@ -36,41 +41,38 @@ void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
         if (chunk.getSunlight(newFloodPosition) < lightLevel)
         {
             floodLights(chunk, newFloodPosition, lightLevel);
-        } 
+        }
     };
 
     tryFlood({1, 0, 0});
     tryFlood({-1, 0, 0});
     tryFlood({0, 1, 0});
     tryFlood({0, -1, 0});
-   // tryFlood({1, 0, 1});
-   // tryFlood({1, 0, -1});
 }
 
 Game::Game()
 {
     m_sceneShader.loadFromFile("SceneVertex.glsl", "SceneFragment.glsl");
-    m_terrain.bufferMesh(createTerrainMesh(256, 256, true));
-    m_lightCube.bufferMesh(createCubeMesh({10.5f, 10.5f, 10.5f}));
+    m_lightCube.bufferMesh(createCubeMesh({0.5f, 1.5f, 0.5f}));
     m_texture.loadFromFile("OpenGLLogo.png", 8);
 
     m_voxelShader.loadFromFile("TerrainVertex.glsl", "TerrainFragment.glsl");
 
     float aspect = (float)WIDTH / (float)HEIGHT;
-    m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
-
-    m_lightTransform = {{0, 15, 0}, {0, 0, 0}};
+    m_projectionMatrix = createProjectionMatrix(aspect, 120.0f);
 
     m_chunkTextures.create(16, 16);
     initVoxelSystem(m_chunkTextures);
 
-    int worldHeight = 4;
-    int worldWidth = 4;
-    m_cameraTransform = {{50, worldHeight * CHUNK_SIZE, 50}, {0, 270, 0}};
+    m_cameraTransform = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2, 5},
+                         {0, 270, 0}};
+    m_playerPosition = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2 + 1, 1},
+                        {0, 0, 0}};
 
-    for (int cx = 0; cx < 2; cx++)
+    for (int cy = 0; cy < 4; cy++)
     {
-        for (int cy = 0; cy < 4; cy++)
+
+        for (int cx = 0; cx < 2; cx++)
         {
             Chunk& chunk = m_chunkMap.addChunk({cx, cy});
             createChunkTerrain(chunk, cx, cy, worldWidth, worldHeight, {});
@@ -89,12 +91,7 @@ Game::Game()
             ChunkMesh mesh = createGreedyChunkMesh(chunk);
             VertexArray chunkVertexArray;
             chunkVertexArray.bufferMesh(mesh);
-            int verts = mesh.vertices.size();
-            int faces = verts / 4;
-            std::cout << "Verts " << verts << "    faces     " << faces << std::endl;
-            m_chunkRenderables.emplace_back(mesh.chunkPos, chunkVertexArray.getRendable(),
-                                            verts, faces);
-            m_chunkVertexArrays.push_back(std::move(chunkVertexArray));
+            m_chunkRendersList[chunk.position()] = std::move(chunkVertexArray);
         }
     }
 }
@@ -103,29 +100,51 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 {
     Transform& camera = m_cameraTransform;
 
-    float PLAYER_SPEED = 0.5f;
-    if (keyboard.isKeyDown(sf::Keyboard::LControl))
-    {
-        PLAYER_SPEED = 5.0f;
-    }
+    float PLAYER_SPEED = 0.1f;
+    // if (keyboard.isKeyDown(sf::Keyboard::LControl))
+    //{
+    //    PLAYER_SPEED = 5.0f;
+    //}
+    // if (keyboard.isKeyDown(sf::Keyboard::W))
+    //{
+    //    camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
+    //}
+    // else if (keyboard.isKeyDown(sf::Keyboard::S))
+    //{
+    //    camera.position += backwardsVector(camera.rotation) * PLAYER_SPEED;
+    //}
+    // if (keyboard.isKeyDown(sf::Keyboard::A))
+    //{
+    //    camera.position += leftVector(camera.rotation) * PLAYER_SPEED;
+    //}
+    // else if (keyboard.isKeyDown(sf::Keyboard::D))
+    //{
+    //    camera.position += rightVector(camera.rotation) * PLAYER_SPEED;
+    //}
+
     if (keyboard.isKeyDown(sf::Keyboard::W))
     {
-        camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
+        m_playerPosition.position.y += PLAYER_SPEED;
     }
     else if (keyboard.isKeyDown(sf::Keyboard::S))
     {
-        camera.position += backwardsVector(camera.rotation) * PLAYER_SPEED;
+        m_playerPosition.position.y -= PLAYER_SPEED;
     }
     if (keyboard.isKeyDown(sf::Keyboard::A))
     {
-        camera.position += leftVector(camera.rotation) * PLAYER_SPEED;
+        m_playerPosition.position.x -= PLAYER_SPEED;
     }
     else if (keyboard.isKeyDown(sf::Keyboard::D))
     {
-        camera.position += rightVector(camera.rotation) * PLAYER_SPEED;
+        m_playerPosition.position.x += PLAYER_SPEED;
     }
 
-    if (!isMouseActive)
+    if (keyboard.isKeyDown(sf::Keyboard::Space))
+    {
+        breakBlock();
+    }
+
+    // if (!isMouseActive)
     {
         return;
     }
@@ -142,9 +161,41 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
     camera.rotation.y = (int)camera.rotation.y % 360;
 }
 
-void Game::onUpdate()
+void Game::onUpdate() {}
+
+void Game::breakBlock()
 {
-    m_lightTransform.position.y += std::sin(m_timer.getElapsedTime().asSeconds());
+    // Convert player position to voxel position
+    VoxelPosition vp = {(int)m_playerPosition.position.x % CHUNK_SIZE,
+                        (int)m_playerPosition.position.y % CHUNK_SIZE, 1};
+
+    // Convert to chunk position
+    ChunkPosition cp = {
+        m_playerPosition.position.x / CHUNK_SIZE,
+        m_playerPosition.position.y / CHUNK_SIZE,
+    };
+
+    // Get the global voxel position
+    VoxelPosition gp = {vp.x + cp.x * CHUNK_SIZE, vp.y + cp.y * CHUNK_SIZE, 1};
+
+    std::cout << "BREAKING AT " << cp.x << " " << cp.y << "\n";
+    std::cout << "BREAKING AT " << gp.x << " " << gp.y << "\n\n";
+
+    auto& chunk = m_chunkMap.setVoxel(gp, AIR);
+    for (int x = 0; x < CHUNK_SIZE; x++)
+    {
+        for (int y = 0; y < CHUNK_SIZE; y++)
+        {
+            if (chunk.qGetVoxel({x, y, 0}) == AIR)
+            {
+                floodLights(chunk, {x, y, 1}, 16);
+            }
+        }
+    }
+    ChunkMesh mesh = createGreedyChunkMesh(chunk);
+    VertexArray chunkVertexArray;
+    chunkVertexArray.bufferMesh(mesh);
+    m_chunkRendersList[chunk.position()] = std::move(chunkVertexArray);
 }
 
 void Game::onRender()
@@ -166,23 +217,14 @@ void Game::onGUI() { guiDebugScreen(m_cameraTransform); }
 void Game::renderScene(const glm::mat4& projectionViewMatrix)
 {
     // Normal stuff
-    glDisable(GL_CULL_FACE);
     m_sceneShader.bind();
     m_sceneShader.set("projectionViewMatrix", projectionViewMatrix);
     m_sceneShader.set("isLight", false);
     m_sceneShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
     m_sceneShader.set("eyePosition", m_cameraTransform.position);
 
-    m_texture.bind(0);
-
-    glm::mat4 terrainModel{1.0f};
-    terrainModel = glm::translate(terrainModel, {0, 0, 0});
-    m_sceneShader.set("modelMatrix", terrainModel);
-    m_sceneShader.set("lightPosition", m_lightTransform.position);
-    m_terrain.getRendable().drawElements();
-
     glEnable(GL_CULL_FACE);
-    auto lightModel = createModelMatrix(m_lightTransform);
+    auto lightModel = createModelMatrix(m_playerPosition);
     m_sceneShader.set("modelMatrix", lightModel);
     m_sceneShader.set("isLight", true);
     m_lightCube.getRendable().drawElements();
@@ -190,24 +232,14 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix)
     // Chunks
     m_voxelShader.bind();
     m_voxelShader.set("projectionViewMatrix", projectionViewMatrix);
-    //   m_voxelShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
-    //   m_voxelShader.set("lightDirection", m_lightTransform.rotation);
-    //    m_voxelShader.set("eyePosition", m_cameraTransform.position);
     m_chunkTextures.bind();
 
     glm::mat4 voxelModel{1.0f};
     voxelModel = glm::translate(voxelModel, {0, 0, 0});
     m_voxelShader.set("modelMatrix", voxelModel);
 
-    for (auto& chunk : m_chunkRenderables)
+    for (auto& [position, chunk] : m_chunkRendersList)
     {
-        // if (m_frustum.chunkIsInFrustum(chunk.position)) {
-        chunk.renderable.drawElements();
-        //    if (count) {
-        //        m_stats.chunksDrawn++;
-        //        m_stats.verticiesDrawn += chunk.numVerts;
-        //        m_stats.blockFacesDrawn += chunk.numFaces;
-        //    }
-        //}
+        chunk.getRendable().drawElements();
     }
 }

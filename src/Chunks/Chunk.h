@@ -77,7 +77,7 @@ class ChunkMap
         empty.hasTerrain = true;
     }
 
-    void setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId);
+    Chunk& setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId);
     VoxelID getVoxel(const VoxelPosition& voxelPosition) const;
 
     const Chunk& getChunk(const ChunkPosition& chunk) const;

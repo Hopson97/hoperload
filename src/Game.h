@@ -15,23 +15,6 @@
 
 class Keyboard;
 
-struct ChunkRenderable
-{
-    ChunkRenderable(const ChunkPosition& chunkPosition, Renderable chunkRenderable,
-                    uint16_t verts, uint16_t faces)
-        : position(chunkPosition)
-        , renderable(chunkRenderable)
-        , numVerts(verts)
-        , numFaces(faces)
-    {
-    }
-
-    ChunkPosition position;
-    Renderable renderable;
-    uint16_t numVerts;
-    uint16_t numFaces;
-};
-
 class Game
 {
 
@@ -46,25 +29,27 @@ class Game
 
     void onGUI();
 
+
   private:
+    void breakBlock();
     void renderScene(const glm::mat4& projectionViewMatrix);
 
     Shader m_sceneShader;
-    VertexArray m_terrain;
     VertexArray m_lightCube;
     Texture2D m_texture;
 
     ViewFrustum m_frustum;
     Transform m_cameraTransform;
-    Transform m_lightTransform;
+    Transform m_playerPosition;
 
     glm::mat4 m_projectionMatrix;
 
     sf::Clock m_timer;
 
     ChunkMap m_chunkMap;
+
     TextureArray2D m_chunkTextures;
-    std::vector<ChunkRenderable> m_chunkRenderables;
+    std::unordered_map<ChunkPosition, VertexArray, ChunkPositionHash> m_chunkRendersList;
     std::vector<VertexArray> m_chunkVertexArrays;
     Shader m_voxelShader;
 };

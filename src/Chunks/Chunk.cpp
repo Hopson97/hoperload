@@ -137,7 +137,7 @@ bool Chunk::compareStep(VoxelPosition a, VoxelPosition b, int dir, bool isBackFa
 ///
 ///
 ///
-void ChunkMap::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
+Chunk& ChunkMap::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
     auto chunkPosition = toChunkPosition(voxelPosition);
     auto itr = m_chunks.find(chunkPosition);
@@ -145,12 +145,14 @@ void ChunkMap::setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
     if (itr != m_chunks.cend())
     {
         itr->second.qSetVoxel(local, voxelId);
+        return itr->second;
     }
     else
     {
-        addChunk(chunkPosition).qSetVoxel(local, voxelId);
+        Chunk& c = addChunk(chunkPosition);
+        c.qSetVoxel(local, voxelId);
+        return c;
     }
-    ensureNeighbours(chunkPosition);
 }
 
 VoxelID ChunkMap::getVoxel(const VoxelPosition& voxelPosition) const
