@@ -118,6 +118,28 @@ VoxelID ChunkMap::getVoxel(const VoxelPosition& voxelPosition) const
     return itr->second.qGetVoxel(globalVoxelToLocalVoxelPosition(voxelPosition));
 }
 
+void ChunkMap::setSunlight(const VoxelPosition& voxelPosition, uint8_t light)
+{
+    auto chunkPosition = worldToChunkPosition(voxelPosition);
+    auto itr = m_chunks.find(chunkPosition);
+    auto local = globalVoxelToLocalVoxelPosition(voxelPosition);
+    if (itr != m_chunks.cend())
+    {
+        itr->second.setSunlight(local, light);
+    }
+}
+
+uint8_t ChunkMap::getSunlight(const VoxelPosition& voxelPosition) const
+{
+    auto chunkPosition = worldToChunkPosition(voxelPosition);
+    auto itr = m_chunks.find(chunkPosition);
+    if (itr == m_chunks.cend())
+    {
+        return 15;
+    }
+    return itr->second.getSunlight(globalVoxelToLocalVoxelPosition(voxelPosition));
+}
+
 const Chunk& ChunkMap::getChunk(const ChunkPosition& chunk) const
 {
     auto itr = m_chunks.find(chunk);

@@ -6,8 +6,8 @@
 
 #include "Chunk.h"
 
-// Regular vertex except it uses a 3D texture so that it can support OpenGL 2D Texture
-// Arrays
+// Regular vertex except it uses a 3D texture so that it can support OpenGL 2D
+// Texture Arrays
 struct VoxelVertex
 {
     glm::vec3 position{0.0f};

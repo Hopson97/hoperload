@@ -2,6 +2,7 @@
 
 #include "Chunks/ChunkMesh.h"
 #include "Chunks/ChunkTerrainGen.h"
+#include "Chunks/Conversions.h"
 #include "Chunks/Voxels.h"
 #include "Utility.h"
 
@@ -66,8 +67,7 @@ Game::Game()
 
     m_cameraTransform = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2, 10},
                          {0, 270, 0}};
-    m_playerPosition = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2 + 1, 1},
-                        {0, 0, 0}};
+    m_player = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2 + 1, 1}, {0, 0, 0}};
 
     for (int cy = 0; cy < 4; cy++)
     {
@@ -124,23 +124,23 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
 
     if (keyboard.isKeyDown(sf::Keyboard::W))
     {
-        m_playerPosition.position.y += PLAYER_SPEED;
+        m_player.position.y += PLAYER_SPEED;
     }
     else if (keyboard.isKeyDown(sf::Keyboard::S))
     {
-        m_playerPosition.position.y -= PLAYER_SPEED;
+        m_player.position.y -= PLAYER_SPEED;
     }
     if (keyboard.isKeyDown(sf::Keyboard::A))
     {
-        m_playerPosition.position.x -= PLAYER_SPEED;
+        m_player.position.x -= PLAYER_SPEED;
     }
     else if (keyboard.isKeyDown(sf::Keyboard::D))
     {
-        m_playerPosition.position.x += PLAYER_SPEED;
+        m_player.position.x += PLAYER_SPEED;
     }
 
-    m_cameraTransform.position.x = m_playerPosition.position.x;
-    m_cameraTransform.position.y = m_playerPosition.position.y;
+    m_cameraTransform.position.x = m_player.position.x;
+    m_cameraTransform.position.y = m_player.position.y;
 
     if (keyboard.isKeyDown(sf::Keyboard::Space))
     {
@@ -148,8 +148,7 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
         {
             for (int x = -1; x <= 1; x++)
             {
-                breakBlock(m_playerPosition.position.x + x,
-                           m_playerPosition.position.y + y);
+                breakBlock(m_player.position.x + x, m_player.position.y + y);
             }
         }
     }
@@ -175,20 +174,7 @@ void Game::onUpdate() {}
 
 void Game::breakBlock(int x, int y)
 {
-    // Convert player position to voxel position
-    VoxelPosition localVoxel = {x % CHUNK_SIZE, y % CHUNK_SIZE, 1};
-
-    // Convert to chunk position
-    ChunkPosition localChunk = {
-        x / CHUNK_SIZE,
-        y / CHUNK_SIZE,
-    };
-
-    // Get the global voxel position
-    VoxelPosition globalVoxel = {localVoxel.x + localChunk.x * CHUNK_SIZE,
-                                 localVoxel.y + localChunk.y * CHUNK_SIZE, 1};
-
-    auto& chunk = m_chunkMap.setVoxel(globalVoxel, AIR);
+    auto& chunk = m_chunkMap.setVoxel(worldToGlobalVoxelPosition({x, y, 1}), AIR);
     for (int x = 0; x < CHUNK_SIZE; x++)
     {
         for (int y = 0; y < CHUNK_SIZE; y++)
@@ -199,6 +185,7 @@ void Game::breakBlock(int x, int y)
             }
         }
     }
+
     ChunkMesh mesh = createGreedyChunkMesh(chunk);
     VertexArray chunkVertexArray;
     chunkVertexArray.bufferMesh(mesh);
@@ -226,13 +213,15 @@ void Game::renderScene(const glm::mat4& projectionViewMatrix)
     // Normal stuff
     m_sceneShader.bind();
     m_sceneShader.set("projectionViewMatrix", projectionViewMatrix);
-    m_sceneShader.set("eyePosition", m_cameraTransform.position);
+    // m_sceneShader.set("eyePosition", m_cameraTransform.position);
 
     glEnable(GL_CULL_FACE);
 
-    m_sceneShader.set("lightColour", glm::vec3{1.0, 1.0, 1.0});
+    float light =
+        m_chunkMap.getSunlight(worldToGlobalVoxelPosition(m_player.position)) / 15.0f;
+    m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
-    auto lightModel = createModelMatrix(m_playerPosition);
+    auto lightModel = createModelMatrix(m_player);
     m_sceneShader.set("modelMatrix", lightModel);
     m_lightCube.getRendable().drawElements();
 

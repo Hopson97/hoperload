@@ -39,7 +39,7 @@ class Game
 
     ViewFrustum m_frustum;
     Transform m_cameraTransform;
-    Transform m_playerPosition;
+    Transform m_player;
 
     glm::mat4 m_projectionMatrix;
 

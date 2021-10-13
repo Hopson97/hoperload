@@ -80,6 +80,9 @@ class ChunkMap
     Chunk& setVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId);
     VoxelID getVoxel(const VoxelPosition& voxelPosition) const;
 
+    void setSunlight(const VoxelPosition& voxelPosition, uint8_t light);
+    uint8_t getSunlight(const VoxelPosition& voxelPosition) const;
+
     const Chunk& getChunk(const ChunkPosition& chunk) const;
 
     Chunk& addChunk(const ChunkPosition& chunk);
