@@ -50,4 +50,6 @@ class Game
     std::unordered_map<ChunkPosition, VertexArray, ChunkPositionHash> m_chunkRendersList;
     std::vector<VertexArray> m_chunkVertexArrays;
     Shader m_voxelShader;
+
+    float m_cameraZoom = 10;
 };

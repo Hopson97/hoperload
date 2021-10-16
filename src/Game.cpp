@@ -6,8 +6,8 @@
 #include "Chunks/Voxels.h"
 #include "Utility.h"
 
-int worldHeight = 16;
-int worldWidth = 8;
+int worldHeight = 14;
+int worldWidth = 4;
 
 int toIndex(int x, int y) { return x + y * CHUNK_SIZE; }
 
@@ -28,7 +28,7 @@ void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
     }
     else
     {
-        lightLevel -= 5;
+        lightLevel -= 4;
     }
 
     if (lightLevel <= 0)
@@ -97,19 +97,23 @@ Game::Game()
 }
 
 bool freecam = false;
-void Game::onEvent(const sf::Event& e) 
+void Game::onEvent(const sf::Event& e)
 {
     switch (e.type)
     {
-    case sf::Event::KeyReleased:
-        if (e.key.code == sf::Keyboard::F) {
-            freecam = !freecam;
-        }
-        /* code */
-        break;
-    
-    default:
-        break;
+        case sf::Event::KeyReleased:
+            if (e.key.code == sf::Keyboard::F)
+            {
+                freecam = !freecam;
+            }
+            break;
+
+        case sf::Event::MouseWheelScrolled:
+            m_cameraZoom -= e.mouseWheelScroll.delta / 2;
+            break;
+
+        default:
+            break;
     }
 }
 
@@ -198,8 +202,8 @@ void Game::onUpdate(const sf::Time& time)
         m_player.position += m_playerVelocity * time.asSeconds();
         m_playerVelocity *= 0.98;
 
-    m_cameraTransform = {{m_player.position.x, m_player.position.y, 10},
-                         {0, 270, 0}};
+        m_cameraTransform = {{m_player.position.x, m_player.position.y, m_cameraZoom},
+                             {0, 270, 0}};
     }
 }
 
