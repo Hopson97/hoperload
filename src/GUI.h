@@ -11,7 +11,7 @@ struct Transform;
 struct TerrainGenOptions;
 struct GraphicsOptions;
 
-class Game;
+class Hoperload;
 
 void guiInit(sf::Window& window);
 void guiShutdown();

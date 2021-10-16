@@ -11232,7 +11232,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 /*  stb_truetype.h - v1.24 - public domain */
-/*  authored from 2009-2020 by Sean Barrett / RAD Game Tools */
+/*  authored from 2009-2020 by Sean Barrett / RAD Hoperload Tools */
 /*  */
 /*  ======================================================================= */
 /*  */
@@ -11276,7 +11276,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /*    Bug/warning reports/fixes: */
 /*        "Zer" on mollyrocket       Fabian "ryg" Giesen   github:NiLuJe */
 /*        Cass Everitt               Martins Mozeiko       github:aloucks */
-/*        stoiko (Haemimont Games)   Cap Petschulat        github:oyvindjam */
+/*        stoiko (Haemimont Hoperloads)   Cap Petschulat        github:oyvindjam */
 /*        Brian Hook                 Omar Cornut           github:vassvik */
 /*        Walter van Niftrik         Ryan Griege */
 /*        David Gow                  Peter LaValle */

@@ -1,5 +1,5 @@
 #include "GUI.h"
-#include "Game.h"
+#include "Hoperload.h"
 #include "Graphics/GLWrappers.h"
 #include "Utility.h"
 #include <SFML/GpuPreference.hpp>
@@ -25,7 +25,7 @@ int main()
     sf::Time lag = sf::Time::Zero;
     sf::Clock updateClock;
 
-    Game game;
+    Hoperload game;
     Keyboard keyboard;
     while (window.isOpen())
     {
@@ -51,7 +51,6 @@ int main()
         }
 
         // Get times
-        sf::Time dt = updateClock.restart();
         sf::Time time = timer.getElapsedTime();
         sf::Time elapsed = time - lastTime;
         lastTime = time;

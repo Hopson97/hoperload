@@ -16,7 +16,7 @@ add_executable(${PROJECT_NAME}
     src/GUI.cpp
     src/Maths.cpp
     src/Utility.cpp
-    src/Game.cpp
+    src/Hoperload.cpp
 
     src/Chunks/Chunk.cpp
     src/Chunks/Conversions.cpp

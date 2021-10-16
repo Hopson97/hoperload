@@ -15,11 +15,11 @@
 
 class Keyboard;
 
-class Game
+class Hoperload
 {
 
   public:
-    Game();
+    Hoperload();
 
     void onEvent(const sf::Event& e);
     void onInput(const Keyboard& keyboard, const sf::Window& window, bool isMouseActive);

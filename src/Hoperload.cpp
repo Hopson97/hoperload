@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "Hoperload.h"
 
 #include "Chunks/ChunkMesh.h"
 #include "Chunks/ChunkTerrainGen.h"
@@ -51,7 +51,7 @@ void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
     tryFlood({0, -1, 0});
 }
 
-Game::Game()
+Hoperload::Hoperload()
 {
     m_sceneShader.loadFromFile("SceneVertex.glsl", "SceneFragment.glsl");
     m_lightCube.bufferMesh(createCubeMesh({0.5f, 1.5f, 0.5f}));
@@ -97,7 +97,7 @@ Game::Game()
 }
 
 bool freecam = false;
-void Game::onEvent(const sf::Event& e)
+void Hoperload::onEvent(const sf::Event& e)
 {
     switch (e.type)
     {
@@ -117,7 +117,7 @@ void Game::onEvent(const sf::Event& e)
     }
 }
 
-void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMouseActive)
+void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMouseActive)
 {
     Transform& camera = m_cameraTransform;
 
@@ -195,7 +195,7 @@ void Game::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMo
     }
 }
 
-void Game::onUpdate(const sf::Time& time)
+void Hoperload::onUpdate(const sf::Time& time)
 {
     if (!freecam)
     {
@@ -207,7 +207,7 @@ void Game::onUpdate(const sf::Time& time)
     }
 }
 
-void Game::breakBlock(int x, int y)
+void Hoperload::breakBlock(int x, int y)
 {
     auto& chunk = m_chunkMap.setVoxel(worldToGlobalVoxelPosition({x, y, 1}), AIR);
     for (int x = 0; x < CHUNK_SIZE; x++)
@@ -228,7 +228,7 @@ void Game::breakBlock(int x, int y)
     m_chunkRendersList[chunk.position()] = std::move(chunkVertexArray);
 }
 
-void Game::onRender()
+void Hoperload::onRender()
 {
     setClearColour(COLOUR_SKY_BLUE);
 
@@ -242,9 +242,9 @@ void Game::onRender()
     renderScene(projectionViewMatrix);
 }
 
-void Game::onGUI() { guiDebugScreen(m_cameraTransform); }
+void Hoperload::onGUI() { guiDebugScreen(m_cameraTransform); }
 
-void Game::renderScene(const glm::mat4& projectionViewMatrix)
+void Hoperload::renderScene(const glm::mat4& projectionViewMatrix)
 {
     // Normal stuff
     m_sceneShader.bind();
