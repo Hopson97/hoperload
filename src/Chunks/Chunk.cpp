@@ -200,4 +200,7 @@ bool ChunkMap::hasNeighbours(const ChunkPosition& chunkPosition) const
            getChunk({cp.x - 1, cp.y}).hasTerrain && getChunk({cp.x + 1, cp.y}).hasTerrain;
 }
 
-void ChunkMap::destroyWorld() { m_chunks.clear(); }
+void ChunkMap::destroyWorld()
+{
+    m_chunks.clear();
+}

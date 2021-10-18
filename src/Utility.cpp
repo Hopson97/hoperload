@@ -119,9 +119,15 @@ char* getFileContent(const char* fileName)
     return buffer;
 }
 
-void setBackgroundColour(Colour colour) { setTerminalColour(colour, COL_SET_BG); }
+void setBackgroundColour(Colour colour)
+{
+    setTerminalColour(colour, COL_SET_BG);
+}
 
-void setTextColour(Colour colour) { setTerminalColour(colour, COL_SET_FG); }
+void setTextColour(Colour colour)
+{
+    setTerminalColour(colour, COL_SET_FG);
+}
 
 void setTextColourRGB(uint8_t red, uint8_t green, uint8_t blue)
 {

@@ -4,7 +4,10 @@
 #include "Texture.h"
 #include <stdio.h>
 
-Framebuffer::Framebuffer() { glCreateFramebuffers(1, &m_fbo); }
+Framebuffer::Framebuffer()
+{
+    glCreateFramebuffers(1, &m_fbo);
+}
 
 void Framebuffer::create(GLuint width, GLuint height)
 {

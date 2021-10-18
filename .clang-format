@@ -9,3 +9,4 @@ BreakConstructorInitializersBeforeComma: true
 ColumnLimit: 90
 AlwaysBreakTemplateDeclarations: true
 PointerAlignment: Left
+AllowShortFunctionsOnASingleLine: None

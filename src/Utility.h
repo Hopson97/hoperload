@@ -28,9 +28,15 @@ enum ColourSetMode
 class Keyboard
 {
   public:
-    Keyboard() { std::fill(m_keys.begin(), m_keys.end(), false); }
+    Keyboard()
+    {
+        std::fill(m_keys.begin(), m_keys.end(), false);
+    }
 
-    bool isKeyDown(sf::Keyboard::Key key) const { return m_keys[key]; }
+    bool isKeyDown(sf::Keyboard::Key key) const
+    {
+        return m_keys[key];
+    }
 
     void update(sf::Event e)
     {

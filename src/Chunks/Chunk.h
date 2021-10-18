@@ -57,7 +57,10 @@ class Chunk
     void setTorchlight(const VoxelPosition& voxelPosition, uint8_t light);
     uint8_t getTorchlight(const VoxelPosition& voxelPosition) const;
 
-    ChunkPosition position() const { return m_position; };
+    ChunkPosition position() const
+    {
+        return m_position;
+    };
 
     bool isFaceVisible(VoxelPosition pos, int axis, bool isBackFace) const;
     bool compareStep(VoxelPosition a, VoxelPosition b, int dir, bool isBackFace) const;

@@ -132,7 +132,10 @@ void VertexArray::bufferMesh(const ChunkMesh& mesh)
     bufferIndicesData(mesh.indices);
 }
 
-Renderable VertexArray::getRendable() { return {m_vao, m_numIndices}; }
+Renderable VertexArray::getRendable()
+{
+    return {m_vao, m_numIndices};
+}
 
 void Renderable::drawArrays(GLsizei count) const
 {

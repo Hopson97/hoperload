@@ -56,7 +56,10 @@ glm::vec3 forwardsVector(const glm::vec3& rotation)
             glm::cos(pitch) * glm::sin(yaw)};
 }
 
-glm::vec3 backwardsVector(const glm::vec3& rotation) { return -forwardsVector(rotation); }
+glm::vec3 backwardsVector(const glm::vec3& rotation)
+{
+    return -forwardsVector(rotation);
+}
 
 glm::vec3 leftVector(const glm::vec3& rotation)
 {
@@ -64,7 +67,10 @@ glm::vec3 leftVector(const glm::vec3& rotation)
     return {-glm::cos(yaw), 0, -glm::sin(yaw)};
 }
 
-glm::vec3 rightVector(const glm::vec3& rotation) { return -leftVector(rotation); }
+glm::vec3 rightVector(const glm::vec3& rotation)
+{
+    return -leftVector(rotation);
+}
 
 // https://web.archive.org/web/20160327184424/http://ruh.li/CameraViewFrustum.html
 enum Planes

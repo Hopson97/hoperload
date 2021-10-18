@@ -4,7 +4,10 @@
 #include <cstring>
 #include <iostream>
 
-Texture2D ::Texture2D() { glCreateTextures(GL_TEXTURE_2D, 1, &m_handle); }
+Texture2D ::Texture2D()
+{
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_handle);
+}
 
 Texture2D& Texture2D ::operator=(Texture2D&& other) noexcept
 {
@@ -19,7 +22,10 @@ Texture2D ::Texture2D(Texture2D&& other) noexcept
     other.m_handle = 0;
 }
 
-Texture2D::~Texture2D() { glDeleteTextures(1, &m_handle); }
+Texture2D::~Texture2D()
+{
+    glDeleteTextures(1, &m_handle);
+}
 
 void Texture2D::loadFromFile(const char* file, int mipmapLevels)
 {
@@ -51,7 +57,10 @@ void Texture2D::createFramebufferDepth(GLint width, GLint height)
     useDefaultFilters();
 }
 
-void Texture2D::bind(GLenum unit) const { glBindTextureUnit(unit, m_handle); }
+void Texture2D::bind(GLenum unit) const
+{
+    glBindTextureUnit(unit, m_handle);
+}
 
 void Texture2D::wrapS(GLint param)
 {
@@ -82,7 +91,10 @@ void Texture2D::useDefaultFilters()
     glTextureParameterf(m_handle, GL_TEXTURE_LOD_BIAS, -0.6f);
 }
 
-TextureArray2D::TextureArray2D() { glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_handle); }
+TextureArray2D::TextureArray2D()
+{
+    glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_handle);
+}
 
 TextureArray2D& TextureArray2D ::operator=(TextureArray2D&& other) noexcept
 {
@@ -109,7 +121,10 @@ TextureArray2D ::TextureArray2D(TextureArray2D&& other) noexcept
     other.m_maxTextures = 0;
 }
 
-TextureArray2D::~TextureArray2D() { glDeleteTextures(1, &m_handle); }
+TextureArray2D::~TextureArray2D()
+{
+    glDeleteTextures(1, &m_handle);
+}
 
 void TextureArray2D::create(GLuint textureDims, GLuint textureCount)
 {
@@ -146,4 +161,7 @@ GLuint TextureArray2D::addTexture(const char* file)
     return m_textureCount++;
 }
 
-void TextureArray2D::bind() const { glBindTextureUnit(0, m_handle); }
+void TextureArray2D::bind() const
+{
+    glBindTextureUnit(0, m_handle);
+}

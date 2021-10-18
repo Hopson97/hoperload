@@ -26,9 +26,15 @@ void initVoxelSystem(TextureArray2D& textureArray)
     voxels[TEST_TORCH] = {"Test Torch", 0, 0, 0, true, true};
 }
 
-const Voxel& getVoxelType(VoxelType type) { return voxels[type]; }
+const Voxel& getVoxelType(VoxelType type)
+{
+    return voxels[type];
+}
 
-bool isVoxelSolid(uint16_t i) { return i > VoxelType::WATER; }
+bool isVoxelSolid(uint16_t i)
+{
+    return i > VoxelType::WATER;
+}
 
 GLuint getVoxelTexture(uint16_t id, int direction, bool isBackFace)
 {

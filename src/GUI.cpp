@@ -53,7 +53,10 @@ void guiInit(sf::Window& window)
     // nk_set_style(ctx, THEME_DARK);
 }
 
-void guiShutdown(void) { nk_sfml_shutdown(); }
+void guiShutdown(void)
+{
+    nk_sfml_shutdown();
+}
 
 void guiBeginFrame(void)
 {
@@ -69,7 +72,10 @@ void guiBeginFrame(void)
     }
 }
 
-void guiProcessEvent(sf::Event& event) { nk_sfml_handle_event(&event); }
+void guiProcessEvent(sf::Event& event)
+{
+    nk_sfml_handle_event(&event);
+}
 
 void guiEndFrame(void)
 {
