@@ -13,10 +13,12 @@ conan_basic_setup()
 #Set executable
 add_executable(${PROJECT_NAME}     
     src/main.cpp
+    src/Camera.cpp
     src/GUI.cpp
+    src/Hoperload.cpp
     src/Maths.cpp
     src/Utility.cpp
-    src/Hoperload.cpp
+    src/World.cpp
 
     src/Chunks/Chunk.cpp
     src/Chunks/Conversions.cpp

@@ -1,6 +1,6 @@
 #include "GUI.h"
-#include "Hoperload.h"
 #include "Graphics/GLWrappers.h"
+#include "Hoperload.h"
 #include "Utility.h"
 #include <SFML/GpuPreference.hpp>
 
