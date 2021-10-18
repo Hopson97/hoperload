@@ -9,7 +9,10 @@ namespace
     int worldWidth = 4;
 } // namespace
 
-int toIndex(int x, int y) { return x + y * CHUNK_SIZE; }
+int toIndex(int x, int y)
+{
+    return x + y * CHUNK_SIZE;
+}
 
 Hoperload::Hoperload()
 {
@@ -18,6 +21,7 @@ Hoperload::Hoperload()
     m_texture.loadFromFile("OpenGLLogo.png", 8);
 
     m_player = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2 + 1, 1}, {0, 0, 0}};
+    m_camera.hookTransform(&m_player);
 }
 
 bool freecam = false;
@@ -33,7 +37,14 @@ void Hoperload::onEvent(const sf::Event& e)
             break;
 
         case sf::Event::MouseWheelScrolled:
-            m_camera.zoom -= e.mouseWheelScroll.delta / 2;
+            if (e.mouseWheelScroll.delta > 0)
+            {
+                m_camera.zoomIn();
+            }
+            else
+            {
+                m_camera.zoomOut();
+            }
             break;
 
         default:
@@ -44,73 +55,72 @@ void Hoperload::onEvent(const sf::Event& e)
 void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window,
                         bool isMouseActive)
 {
-    Transform& camera = m_camera.m_transform;
-
     float PLAYER_SPEED = 0.5f;
 
-    if (freecam)
+    // if (freecam)
+    //{
+    //        m_camera.zoom -= e.mouseWheelScroll.delta / 2;
+    //    if (keyboard.isKeyDown(sf::Keyboard::LControl))
+    //    {
+    //        PLAYER_SPEED = 5.0f;
+    //    }
+    //    if (keyboard.isKeyDown(sf::Keyboard::W))
+    //    {
+    //        camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
+    //    }
+    //    else if (keyboard.isKeyDown(sf::Keyboard::S))
+    //    {
+    //        camera.position += backwardsVector(camera.rotation) * PLAYER_SPEED;
+    //    }
+    //    if (keyboard.isKeyDown(sf::Keyboard::A))
+    //    {
+    //        camera.position += leftVector(camera.rotation) * PLAYER_SPEED;
+    //    }
+    //    else if (keyboard.isKeyDown(sf::Keyboard::D))
+    //    {
+    //        camera.position += rightVector(camera.rotation) * PLAYER_SPEED;
+    //    }
+    //
+    //    if (!isMouseActive)
+    //    {
+    //        return;
+    //    }
+    //    static auto lastMousePosition = sf::Mouse::getPosition(window);
+    //    auto change = sf::Mouse::getPosition(window) - lastMousePosition;
+    //    camera.rotation.x -= static_cast<float>(change.y * 0.5);
+    //    camera.rotation.y += static_cast<float>(change.x * 0.5);
+    //    sf::Mouse::setPosition({(int)window.getSize().x / 2, (int)window.getSize().y /
+    //    2},
+    //                           window);
+    //    lastMousePosition.x = (int)window.getSize().x / 2;
+    //    lastMousePosition.y = (int)window.getSize().y / 2;
+    //
+    //    camera.rotation.x = glm::clamp(camera.rotation.x, -89.9f, 89.9f);
+    //    camera.rotation.y = (int)camera.rotation.y % 360;
+    //}
+    // else
+    //{
+
+    if (keyboard.isKeyDown(sf::Keyboard::W))
     {
-        if (keyboard.isKeyDown(sf::Keyboard::LControl))
-        {
-            PLAYER_SPEED = 5.0f;
-        }
-        if (keyboard.isKeyDown(sf::Keyboard::W))
-        {
-            camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
-        }
-        else if (keyboard.isKeyDown(sf::Keyboard::S))
-        {
-            camera.position += backwardsVector(camera.rotation) * PLAYER_SPEED;
-        }
-        if (keyboard.isKeyDown(sf::Keyboard::A))
-        {
-            camera.position += leftVector(camera.rotation) * PLAYER_SPEED;
-        }
-        else if (keyboard.isKeyDown(sf::Keyboard::D))
-        {
-            camera.position += rightVector(camera.rotation) * PLAYER_SPEED;
-        }
-
-        if (!isMouseActive)
-        {
-            return;
-        }
-        static auto lastMousePosition = sf::Mouse::getPosition(window);
-        auto change = sf::Mouse::getPosition(window) - lastMousePosition;
-        camera.rotation.x -= static_cast<float>(change.y * 0.5);
-        camera.rotation.y += static_cast<float>(change.x * 0.5);
-        sf::Mouse::setPosition({(int)window.getSize().x / 2, (int)window.getSize().y / 2},
-                               window);
-        lastMousePosition.x = (int)window.getSize().x / 2;
-        lastMousePosition.y = (int)window.getSize().y / 2;
-
-        camera.rotation.x = glm::clamp(camera.rotation.x, -89.9f, 89.9f);
-        camera.rotation.y = (int)camera.rotation.y % 360;
+        m_playerVelocity.y += PLAYER_SPEED;
     }
-    else
+    else if (keyboard.isKeyDown(sf::Keyboard::S))
     {
+        m_playerVelocity.y -= PLAYER_SPEED;
+    }
+    if (keyboard.isKeyDown(sf::Keyboard::A))
+    {
+        m_playerVelocity.x -= PLAYER_SPEED;
+    }
+    else if (keyboard.isKeyDown(sf::Keyboard::D))
+    {
+        m_playerVelocity.x += PLAYER_SPEED;
+    }
 
-        if (keyboard.isKeyDown(sf::Keyboard::W))
-        {
-            m_playerVelocity.y += PLAYER_SPEED;
-        }
-        else if (keyboard.isKeyDown(sf::Keyboard::S))
-        {
-            m_playerVelocity.y -= PLAYER_SPEED;
-        }
-        if (keyboard.isKeyDown(sf::Keyboard::A))
-        {
-            m_playerVelocity.x -= PLAYER_SPEED;
-        }
-        else if (keyboard.isKeyDown(sf::Keyboard::D))
-        {
-            m_playerVelocity.x += PLAYER_SPEED;
-        }
-
-        if (keyboard.isKeyDown(sf::Keyboard::Space))
-        {
-            m_world.breakBlock(m_player.position.x, m_player.position.y);
-        }
+    if (keyboard.isKeyDown(sf::Keyboard::Space))
+    {
+        m_world.breakBlock(m_player.position.x, m_player.position.y);
     }
 }
 
@@ -121,9 +131,6 @@ void Hoperload::onUpdate(const sf::Time& time)
     {
         m_player.position += m_playerVelocity * time.asSeconds();
         m_playerVelocity *= 0.98;
-
-        m_camera.m_transform = {{m_player.position.x, m_player.position.y + 5, m_camera.zoom},
-                                {0, 270, 0}};
     }
 }
 
@@ -134,12 +141,9 @@ void Hoperload::onRender()
     Framebuffer::unbind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    auto& pv = m_camera.m_pvMatrix;
-
     // Normal stuff
     m_sceneShader.bind();
-    m_sceneShader.set("projectionViewMatrix", pv);
-    // m_sceneShader.set("eyePosition", m_cameraTransform.position);
+    m_sceneShader.set("projectionViewMatrix", m_camera.getProjectionView());
 
     glEnable(GL_CULL_FACE);
     float light = m_world.lightLevelAt(m_player.position.x, m_player.position.y) / 15.0f;
@@ -151,4 +155,6 @@ void Hoperload::onRender()
 
     m_world.render(m_camera);
 }
-void Hoperload::onGUI() { guiDebugScreen(m_camera.m_transform); }
+void Hoperload::onGUI()
+{ /*guiDebugScreen(m_camera.m_transform);*/
+}

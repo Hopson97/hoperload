@@ -18,7 +18,31 @@ Camera::Camera()
 
 void Camera::update()
 {
+    assert(mp_hook);
     auto viewMatrix = createViewMartix(m_transform, {0, 1, 0});
-    m_pvMatrix = m_projectionMatrix * viewMatrix;
-    m_frustum.update(m_pvMatrix);
+    m_projectionViewMatrix = m_projectionMatrix * viewMatrix;
+    m_frustum.update(m_projectionViewMatrix);
+
+    m_transform.position = {mp_hook->position.x, mp_hook->position.y, m_zoom};
+    m_transform.rotation = {0, 270, 0};
+}
+
+void Camera::zoomIn()
+{
+    m_zoom++;
+}
+
+void Camera::zoomOut()
+{
+    m_zoom--;
+}
+
+void Camera::hookTransform(const Transform* hook)
+{
+    mp_hook = hook;
+}
+
+const glm::mat4& Camera::getProjectionView() const
+{
+    return m_projectionViewMatrix;
 }

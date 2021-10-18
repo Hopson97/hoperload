@@ -84,14 +84,16 @@ World::World()
     }
 }
 
-void World::update() {}
+void World::update()
+{
+}
 
 void World::breakBlock(int x, int y)
 {
     placeBlock(x, y, AIR);
 }
 
-void World::placeBlock(int x, int y, VoxelID id) 
+void World::placeBlock(int x, int y, VoxelID id)
 {
     auto& chunk = m_chunkMap.setVoxel(worldToGlobalVoxelPosition({x, y, 1}), id);
     for (int x = 0; x < CHUNK_SIZE; x++)
@@ -121,7 +123,7 @@ void World::render(const Camera& camera)
 {
     // Chunks
     m_voxelShader.bind();
-    m_voxelShader.set("projectionViewMatrix", camera.m_pvMatrix);
+    m_voxelShader.set("projectionViewMatrix", camera.getProjectionView());
     m_chunkTextures.bind();
 
     glm::mat4 voxelModel{1.0f};
