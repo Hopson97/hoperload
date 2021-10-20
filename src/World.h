@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Chunks/Chunk.h"
+#include "Chunks/ChunkMap.h"
 #include "Graphics/GLWrappers.h"
 
 class Camera;

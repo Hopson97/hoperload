@@ -1,5 +1,7 @@
 #include "Conversions.h"
 
+#include "ChunkMap.h"
+
 ChunkPosition worldToChunkPosition(const glm::vec3& vec)
 {
     int x = static_cast<int>(vec.x);
