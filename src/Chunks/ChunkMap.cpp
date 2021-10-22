@@ -53,7 +53,7 @@ uint8_t ChunkMap::getLightLevel(const VoxelPosition& voxelPosition) const
         itr->second.getBlockLight(globalVoxelToLocalVoxelPosition(voxelPosition)));
 }
 
-const Chunk& ChunkMap::getChunk(const ChunkPosition& chunk) const
+Chunk& ChunkMap::getChunk(const ChunkPosition& chunk)
 {
     auto itr = m_chunks.find(chunk);
     if (itr == m_chunks.cend())
@@ -74,25 +74,6 @@ Chunk& ChunkMap::addChunk(const ChunkPosition& chunk)
             .first->second;
     }
     return itr->second;
-}
-
-void ChunkMap::ensureNeighbours(const ChunkPosition& chunkPosition)
-{
-    const auto& cp = chunkPosition;
-    addChunk(cp);
-    addChunk({cp.x, cp.y + 1});
-    addChunk({cp.x, cp.y - 1});
-    addChunk({cp.x - 1, cp.y});
-    addChunk({cp.x + 1, cp.y});
-}
-
-bool ChunkMap::hasNeighbours(const ChunkPosition& chunkPosition) const
-{
-    const auto& cp = chunkPosition;
-
-    return getChunk({cp.x, cp.y + 1}).hasTerrain &&
-           getChunk({cp.x, cp.y - 1}).hasTerrain &&
-           getChunk({cp.x - 1, cp.y}).hasTerrain && getChunk({cp.x + 1, cp.y}).hasTerrain;
 }
 
 void ChunkMap::destroyWorld()

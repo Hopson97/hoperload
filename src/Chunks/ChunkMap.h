@@ -34,12 +34,9 @@ class ChunkMap
 
     uint8_t getLightLevel(const VoxelPosition& voxelPosition) const;
 
-    const Chunk& getChunk(const ChunkPosition& chunk) const;
+    Chunk& getChunk(const ChunkPosition& chunk);
 
     Chunk& addChunk(const ChunkPosition& chunk);
-    void ensureNeighbours(const ChunkPosition& chunkPosition);
-
-    bool hasNeighbours(const ChunkPosition& chunkPosition) const;
 
     void destroyWorld();
 
