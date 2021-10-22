@@ -10,7 +10,7 @@ Camera::Camera()
 {
     float aspect = (float)WIDTH / (float)HEIGHT;
 
-    m_projectionMatrix = createProjectionMatrix(aspect, 110.0f);
+    m_projectionMatrix = createProjectionMatrix(aspect, 80.0f);
     m_transform = {{0, 0, 0}, {0, 270, 0}};
 }
 
@@ -67,12 +67,12 @@ void Camera::update(bool followHook)
 
 void Camera::zoomIn()
 {
-    m_zoom++;
+    m_zoom--;
 }
 
 void Camera::zoomOut()
 {
-    m_zoom--;
+    m_zoom++;
 }
 
 void Camera::hookTransform(const Transform* hook)
@@ -83,4 +83,9 @@ void Camera::hookTransform(const Transform* hook)
 const glm::mat4& Camera::getProjectionView() const
 {
     return m_projectionViewMatrix;
+}
+
+const Transform& Camera::getTransform() const
+{
+    return m_transform;
 }

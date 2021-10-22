@@ -6,6 +6,10 @@ void createChunkTerrain(Chunk& chunk, int chunkX, int chunkY, int worldWidth,
 {
     int BASE_HEIGHT = worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2;
 
+    if (chunkY == worldHeight)
+    {
+    }
+
     for (int y = 0; y < CHUNK_SIZE; y++)
     {
         auto voxelHeight = CHUNK_SIZE * chunkY + y;
@@ -34,12 +38,23 @@ void createChunkTerrain(Chunk& chunk, int chunkX, int chunkY, int worldWidth,
             }
 
             // Lower dirt layer
+            else if (voxelHeight > BASE_HEIGHT - CHUNK_SIZE / 2)
+            {
+                chunk.qSetVoxel({x, y, 0}, DIRT);
+                if (rand() % 64 < 40)
+                {
+                    chunk.qSetVoxel({x, y, 1}, DIRT);
+                }
+            }
             else if (voxelHeight > BASE_HEIGHT - CHUNK_SIZE)
             {
                 chunk.qSetVoxel({x, y, 0}, DIRT);
-                if (rand() % 64 < 50)
+                if (rand() % 64 > 30)
                 {
                     chunk.qSetVoxel({x, y, 1}, DIRT);
+                }
+                else if (rand() % 64 > 10) {
+                    chunk.qSetVoxel({x, y, 1}, STONE);
                 }
             }
 

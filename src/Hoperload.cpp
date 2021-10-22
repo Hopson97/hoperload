@@ -3,6 +3,8 @@
 #include "Chunks/Conversions.h"
 #include "Chunks/Voxels.h"
 #include "Utility.h"
+#include "GUI.h"
+
 namespace
 {
     int worldHeight = 14;
@@ -126,5 +128,6 @@ void Hoperload::onRender()
 }
 
 void Hoperload::onGUI()
-{ /*guiDebugScreen(m_camera.m_transform);*/
+{
+    guiDebugScreen(m_camera.getTransform());
 }

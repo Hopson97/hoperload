@@ -18,10 +18,12 @@ struct Camera
     void hookTransform(const Transform* hook);
     const glm::mat4& getProjectionView() const;
 
+    const Transform& getTransform() const;
+
   private:
     const Transform* mp_hook = nullptr;
     Transform m_transform;
-    float m_zoom = 10;
+    float m_zoom = 12;
 
     ViewFrustum m_frustum;
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Camera.h"
-#include "GUI.h"
 #include "Graphics/GLWrappers.h"
 #include "Maths.h"
 #include "World.h"
