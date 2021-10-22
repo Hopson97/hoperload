@@ -11,46 +11,6 @@ namespace
     int worldWidth = 4;
 } // namespace
 
-void floodLights(Chunk& chunk, VoxelPosition position, int lightLevel)
-{
-    chunk.setSunlight(position, lightLevel);
-    chunk.setSunlight(position + glm::ivec3{0, 0, -1}, std::max(lightLevel - 2, 1));
-
-    auto v = chunk.getVoxel(position);
-    if (v == AIR)
-    {
-
-        lightLevel -= 1;
-    }
-    else if (v == WATER)
-    {
-        lightLevel -= 2;
-    }
-    else
-    {
-        lightLevel -= 4;
-    }
-
-    if (lightLevel <= 0)
-    {
-        return;
-    }
-
-    auto tryFlood = [&](const glm::ivec3 offset) {
-        auto newFloodPosition = position + offset;
-
-        if (chunk.getSunlight(newFloodPosition) <= lightLevel)
-        {
-            floodLights(chunk, newFloodPosition, lightLevel);
-        }
-    };
-
-    tryFlood({1, 0, 0});
-    tryFlood({-1, 0, 0});
-    tryFlood({0, 1, 0});
-    tryFlood({0, -1, 0});
-}
-
 World::World()
 {
     m_voxelShader.loadFromFile("TerrainVertex.glsl", "TerrainFragment.glsl");
@@ -65,16 +25,7 @@ World::World()
             Chunk& chunk = m_chunkMap.addChunk({cx, cy});
             createChunkTerrain(chunk, cx, cy, worldWidth, worldHeight, {});
 
-            for (int x = 0; x < CHUNK_SIZE; x++)
-            {
-                for (int y = 0; y < CHUNK_SIZE; y++)
-                {
-                    if (chunk.qGetVoxel({x, y, 0}) == AIR)
-                    {
-                        floodLights(chunk, {x, y, 1}, 16);
-                    }
-                }
-            }
+            chunk.floodLights();
 
             ChunkMesh mesh = createGreedyChunkMesh(chunk);
             VertexArray chunkVertexArray;
@@ -96,16 +47,8 @@ void World::breakBlock(int x, int y)
 void World::placeBlock(int x, int y, VoxelID id)
 {
     auto& chunk = m_chunkMap.setVoxel(worldToGlobalVoxelPosition({x, y, 1}), id);
-    for (int x = 0; x < CHUNK_SIZE; x++)
-    {
-        for (int y = 0; y < CHUNK_SIZE; y++)
-        {
-            if (chunk.qGetVoxel({x, y, 0}) == AIR)
-            {
-                floodLights(chunk, {x, y, 1}, 16);
-            }
-        }
-    }
+    chunk.resetLights();
+    chunk.floodLights();
 
     ChunkMesh mesh = createGreedyChunkMesh(chunk);
     VertexArray chunkVertexArray;
@@ -114,9 +57,9 @@ void World::placeBlock(int x, int y, VoxelID id)
     m_chunkRendersList[chunk.position()] = std::move(chunkVertexArray);
 }
 
-int World::lightLevelAt(int x, int y)
+int World::getLightLevel(int x, int y)
 {
-    return m_chunkMap.getSunlight(worldToGlobalVoxelPosition({x, y, 1}));
+    return m_chunkMap.getLightLevel(worldToGlobalVoxelPosition({x, y, 1}));
 }
 
 void World::render(const Camera& camera)

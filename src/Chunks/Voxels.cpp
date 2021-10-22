@@ -16,6 +16,7 @@ void initVoxelSystem(TextureArray2D& textureArray)
     GLuint tStone = textureArray.addTexture("Stone.png");
     GLuint tWater = textureArray.addTexture("Water.png");
     GLuint tSand = textureArray.addTexture("Sand.png");
+    GLuint tTorch = textureArray.addTexture("Torch.png");
 
     voxels[AIR] = {"Air", 0, 0, 0, true};
     voxels[GRASS] = {"Grass", tGrass, tGrassSide, tDirt, false};
@@ -23,7 +24,7 @@ void initVoxelSystem(TextureArray2D& textureArray)
     voxels[STONE] = {"Stone", tStone, tStone, tStone, false};
     voxels[WATER] = {"Water", tWater, tWater, tWater, true};
     voxels[SAND] = {"Sand", tSand, tSand, tSand, false};
-    voxels[TEST_TORCH] = {"Test Torch", 0, 0, 0, true, true};
+    voxels[TEST_TORCH] = {"Test Torch", tTorch, tTorch, tTorch, true, true};
 }
 
 const Voxel& getVoxelType(VoxelType type)

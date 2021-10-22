@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Conversions.h"
 #include <array>
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <optional>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
-#include "Conversions.h"
 
 constexpr int CHUNK_SIZE = 64;
 constexpr int CHUNK_DEPTH = 2;
@@ -17,11 +18,12 @@ constexpr int WATER_LEVEL = CHUNK_SIZE;
 
 class ChunkMap;
 
-struct VoxelInstance
+struct VoxelPositionHash
 {
-    VoxelID kind = 0;
-    uint8_t sunLight = 0;
-    uint8_t torchLight = 0;
+    std::size_t operator()(const VoxelPosition& position) const
+    {
+        return (position.x * 88339) ^ (position.y * 91967) ^ (position.z * 91967);
+    }
 };
 
 class Chunk
@@ -42,8 +44,11 @@ class Chunk
     void setSunlight(const VoxelPosition& voxelPosition, uint8_t light);
     uint8_t getSunlight(const VoxelPosition& voxelPosition) const;
 
-    void setTorchlight(const VoxelPosition& voxelPosition, uint8_t light);
-    uint8_t getTorchlight(const VoxelPosition& voxelPosition) const;
+    void setBlockLight(const VoxelPosition& voxelPosition, uint8_t light);
+    uint8_t getBlockLight(const VoxelPosition& voxelPosition) const;
+
+    void floodLights();
+    void resetLights();
 
     ChunkPosition position() const
     {
@@ -56,8 +61,14 @@ class Chunk
     bool hasTerrain = false;
 
   private:
+    void floodSunlight(VoxelPosition position, int lightLevel);
+    void floodBlockLight(VoxelPosition position, int lightLevel);
+
     ChunkMap* m_pChunkMap;
     ChunkPosition m_position;
 
-    std::array<VoxelInstance, CHUNK_VOLUME> m_voxels;
+    std::array<VoxelID, CHUNK_VOLUME> m_voxels{0};
+    std::array<uint8_t, CHUNK_VOLUME> m_blockLight{0};
+    std::array<uint8_t, CHUNK_VOLUME> m_sunLight{0};
+    std::unordered_set<VoxelPosition, VoxelPositionHash> m_lightPositions;
 };

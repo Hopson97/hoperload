@@ -13,8 +13,6 @@ struct Camera
     void hookTransform(const Transform* hook);
     const glm::mat4& getProjectionView() const;
 
-    
-
   private:
     const Transform* mp_hook = nullptr;
     Transform m_transform;

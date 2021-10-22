@@ -40,7 +40,7 @@ void ChunkMap::setSunlight(const VoxelPosition& voxelPosition, uint8_t light)
     }
 }
 
-uint8_t ChunkMap::getSunlight(const VoxelPosition& voxelPosition) const
+uint8_t ChunkMap::getLightLevel(const VoxelPosition& voxelPosition) const
 {
     auto chunkPosition = worldToChunkPosition(voxelPosition);
     auto itr = m_chunks.find(chunkPosition);
@@ -48,7 +48,9 @@ uint8_t ChunkMap::getSunlight(const VoxelPosition& voxelPosition) const
     {
         return 15;
     }
-    return itr->second.getSunlight(globalVoxelToLocalVoxelPosition(voxelPosition));
+    return std::max(
+        itr->second.getSunlight(globalVoxelToLocalVoxelPosition(voxelPosition)),
+        itr->second.getBlockLight(globalVoxelToLocalVoxelPosition(voxelPosition)));
 }
 
 const Chunk& ChunkMap::getChunk(const ChunkPosition& chunk) const

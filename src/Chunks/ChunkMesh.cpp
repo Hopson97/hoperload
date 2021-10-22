@@ -91,7 +91,8 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
                 // If it is "not air"
                 VoxelPosition voxelPosition(x, y, z);
                 auto voxel = chunk.qGetVoxel(voxelPosition);
-                auto light = chunk.getSunlight(voxelPosition);
+                auto light = std::max(chunk.getSunlight(voxelPosition),
+                                      chunk.getBlockLight(voxelPosition));
                 auto& voxData = getVoxelType((VoxelType)chunk.qGetVoxel({x, y, z}));
 
                 if (voxel != AIR)

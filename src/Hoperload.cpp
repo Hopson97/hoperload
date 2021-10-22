@@ -1,8 +1,8 @@
 #include "Hoperload.h"
 
 #include "Chunks/Conversions.h"
+#include "Chunks/Voxels.h"
 #include "Utility.h"
-
 namespace
 {
     int worldHeight = 14;
@@ -122,6 +122,12 @@ void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window,
     {
         m_world.breakBlock(m_player.position.x, m_player.position.y);
     }
+
+    if (keyboard.isKeyDown(sf::Keyboard::U))
+    {
+        m_world.placeBlock(m_player.position.x, m_player.position.y,
+                           VoxelType::TEST_TORCH);
+    }
 }
 
 void Hoperload::onUpdate(const sf::Time& time)
@@ -146,7 +152,7 @@ void Hoperload::onRender()
     m_sceneShader.set("projectionViewMatrix", m_camera.getProjectionView());
 
     glEnable(GL_CULL_FACE);
-    float light = m_world.lightLevelAt(m_player.position.x, m_player.position.y) / 15.0f;
+    float light = m_world.getLightLevel(m_player.position.x, m_player.position.y) / 15.0f;
     m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
     auto lightModel = createModelMatrix(m_player);
@@ -155,6 +161,7 @@ void Hoperload::onRender()
 
     m_world.render(m_camera);
 }
+
 void Hoperload::onGUI()
 { /*guiDebugScreen(m_camera.m_transform);*/
 }

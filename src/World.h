@@ -16,7 +16,7 @@ class World
     void breakBlock(int x, int y);
     void placeBlock(int x, int y, VoxelID id);
 
-    int lightLevelAt(int x, int y);
+    int getLightLevel(int x, int y);
 
   private:
     ChunkMap m_chunkMap;

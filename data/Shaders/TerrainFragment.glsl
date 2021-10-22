@@ -32,5 +32,10 @@ void main()
 
     vec4 result = vec4(ambient + specular + diffuse, 1.0); 
     */
-    outColour = texture(diffuseTexture, passTextureCoord) * passLight;// * result;
+    vec4 tex = texture(diffuseTexture, passTextureCoord);
+    if (tex.a == 0) {
+        discard;
+    }
+
+    outColour = tex * passLight;// * result;
 }

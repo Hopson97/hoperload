@@ -42,13 +42,24 @@ VoxelID Chunk::getVoxel(const VoxelPosition& voxelPosition) const
 void Chunk::qSetVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
 {
     assert(!voxelPositionOutOfChunkBounds(voxelPosition));
-    m_voxels[localVoxelToLocalIndex(voxelPosition)].kind = voxelId;
+    m_voxels[localVoxelToLocalIndex(voxelPosition)] = voxelId;
+
+    auto itr = m_lightPositions.find(voxelPosition);
+    if (itr != m_lightPositions.end())
+    {
+        m_lightPositions.erase(itr);
+    }
+
+    if (getVoxelType(static_cast<VoxelType>(voxelId)).isLight)
+    {
+        m_lightPositions.emplace(voxelPosition);
+    }
 }
 
 VoxelID Chunk::qGetVoxel(const VoxelPosition& voxelPosition) const
 {
     assert(!voxelPositionOutOfChunkBounds(voxelPosition));
-    return m_voxels[localVoxelToLocalIndex(voxelPosition)].kind;
+    return m_voxels[localVoxelToLocalIndex(voxelPosition)];
 }
 
 void Chunk::setSunlight(const VoxelPosition& voxelPosition, uint8_t light)
@@ -57,7 +68,7 @@ void Chunk::setSunlight(const VoxelPosition& voxelPosition, uint8_t light)
     {
         return;
     }
-    m_voxels[localVoxelToLocalIndex(voxelPosition)].sunLight = light;
+    m_sunLight[localVoxelToLocalIndex(voxelPosition)] = light;
 }
 
 uint8_t Chunk::getSunlight(const VoxelPosition& voxelPosition) const
@@ -66,25 +77,25 @@ uint8_t Chunk::getSunlight(const VoxelPosition& voxelPosition) const
     {
         return 15;
     }
-    return m_voxels[localVoxelToLocalIndex(voxelPosition)].sunLight;
+    return m_sunLight[localVoxelToLocalIndex(voxelPosition)];
 }
 
-void Chunk::setTorchlight(const VoxelPosition& voxelPosition, uint8_t light)
+void Chunk::setBlockLight(const VoxelPosition& voxelPosition, uint8_t light)
 {
     if (voxelPositionOutOfChunkBounds(voxelPosition))
     {
         return;
     }
-    m_voxels[localVoxelToLocalIndex(voxelPosition)].torchLight = light;
+    m_blockLight[localVoxelToLocalIndex(voxelPosition)] = light;
 }
 
-uint8_t Chunk::getTorchlight(const VoxelPosition& voxelPosition) const
+uint8_t Chunk::getBlockLight(const VoxelPosition& voxelPosition) const
 {
     if (voxelPositionOutOfChunkBounds(voxelPosition))
     {
         return 15;
     }
-    return m_voxels[localVoxelToLocalIndex(voxelPosition)].torchLight;
+    return m_blockLight[localVoxelToLocalIndex(voxelPosition)];
 }
 
 bool Chunk::isFaceVisible(VoxelPosition pos, int axis, bool isBackFace) const
@@ -103,9 +114,109 @@ bool Chunk::compareStep(VoxelPosition a, VoxelPosition b, int dir, bool isBackFa
     return voxelA == voxelB && isVoxelSolid(voxelB) && isFaceVisible(b, dir, isBackFace);
 }
 
-///
-///
-///     CHUNK MAP
-///
-///
-///
+void Chunk::floodLights()
+{
+    // Sun
+    for (int x = 0; x < CHUNK_SIZE; x++)
+    {
+        for (int y = 0; y < CHUNK_SIZE; y++)
+        {
+            auto voxel = qGetVoxel({x, y, 0});
+            if (voxel == AIR)
+            {
+                floodSunlight({x, y, 1}, 16);
+            }
+        }
+    }
+
+    for (auto& light : m_lightPositions)
+    {
+        floodBlockLight(light, 15);
+    }
+}
+
+void Chunk::floodSunlight(VoxelPosition position, int lightLevel)
+{
+    setSunlight(position, lightLevel);
+    setSunlight(position + glm::ivec3{0, 0, -1}, std::max(lightLevel - 2, 1));
+
+    auto v = getVoxel(position);
+    if (v == AIR)
+    {
+
+        lightLevel -= 1;
+    }
+    else if (v == WATER)
+    {
+        lightLevel -= 2;
+    }
+    else
+    {
+        lightLevel -= 4;
+    }
+
+    if (lightLevel <= 0)
+    {
+        return;
+    }
+
+    auto tryFlood = [&](const glm::ivec3 offset) {
+        auto newFloodPosition = position + offset;
+
+        if (getSunlight(newFloodPosition) <= lightLevel)
+        {
+            floodSunlight(newFloodPosition, lightLevel);
+        }
+    };
+
+    tryFlood({1, 0, 0});
+    tryFlood({-1, 0, 0});
+    tryFlood({0, 1, 0});
+    tryFlood({0, -1, 0});
+}
+
+void Chunk::floodBlockLight(VoxelPosition position, int lightLevel)
+{
+    setBlockLight(position, lightLevel);
+    setBlockLight(position + glm::ivec3{0, 0, -1}, std::max(lightLevel - 2, 1));
+
+    auto v = getVoxel(position);
+    if (v == AIR)
+    {
+
+        lightLevel -= 1;
+    }
+    else if (v == WATER)
+    {
+        lightLevel -= 2;
+    }
+    else
+    {
+        lightLevel -= 4;
+    }
+
+    if (lightLevel <= 0)
+    {
+        return;
+    }
+
+    auto tryFlood = [&](const glm::ivec3 offset) {
+        auto newFloodPosition = position + offset;
+
+        if (getBlockLight(newFloodPosition) <= lightLevel)
+        {
+            floodBlockLight(newFloodPosition, lightLevel);
+        }
+    };
+
+    tryFlood({1, 0, 0});
+    tryFlood({-1, 0, 0});
+    tryFlood({0, 1, 0});
+    tryFlood({0, -1, 0});
+}
+
+void Chunk::resetLights()
+{
+    m_sunLight.fill(0);
+    m_blockLight.fill(0);
+}
