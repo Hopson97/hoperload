@@ -25,7 +25,7 @@ class Hoperload
 
   private:
     Shader m_sceneShader;
-    VertexArray m_lightCube;
+    VertexArray m_playerCube;
     Texture2D m_texture;
 
     Transform m_player;

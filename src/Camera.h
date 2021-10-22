@@ -1,12 +1,17 @@
 #pragma once
 
 #include "Maths.h"
+#include <SFML/Window/Window.hpp>
+
+class Keyboard;
 
 struct Camera
 {
     Camera();
 
-    void update();
+    void inputFreeCamera(const Keyboard& keyboard, const sf::Window& window);
+
+    void update(bool followHook);
 
     void zoomIn();
     void zoomOut();

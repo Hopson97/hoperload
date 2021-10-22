@@ -17,7 +17,7 @@ int toIndex(int x, int y)
 Hoperload::Hoperload()
 {
     m_sceneShader.loadFromFile("SceneVertex.glsl", "SceneFragment.glsl");
-    m_lightCube.bufferMesh(createCubeMesh({0.5f, 1.5f, 0.5f}));
+    m_playerCube.bufferMesh(createCubeMesh({0.8f, 0.8f, 0.8f}));
     m_texture.loadFromFile("OpenGLLogo.png", 8);
 
     m_player = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2 + 1, 1}, {0, 0, 0}};
@@ -56,83 +56,46 @@ void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window,
                         bool isMouseActive)
 {
     float PLAYER_SPEED = 0.5f;
+    if (freecam)
+    {
+        m_camera.inputFreeCamera(keyboard, window);
+    }
+    else
+    {
+        if (keyboard.isKeyDown(sf::Keyboard::W))
+        {
+            m_playerVelocity.y += PLAYER_SPEED;
+        }
+        else if (keyboard.isKeyDown(sf::Keyboard::S))
+        {
+            m_playerVelocity.y -= PLAYER_SPEED;
+        }
+        if (keyboard.isKeyDown(sf::Keyboard::A))
+        {
+            m_playerVelocity.x -= PLAYER_SPEED;
+        }
+        else if (keyboard.isKeyDown(sf::Keyboard::D))
+        {
+            m_playerVelocity.x += PLAYER_SPEED;
+        }
 
-    // if (freecam)
-    //{
-    //        m_camera.zoom -= e.mouseWheelScroll.delta / 2;
-    //    if (keyboard.isKeyDown(sf::Keyboard::LControl))
-    //    {
-    //        PLAYER_SPEED = 5.0f;
-    //    }
-    //    if (keyboard.isKeyDown(sf::Keyboard::W))
-    //    {
-    //        camera.position += forwardsVector(camera.rotation) * PLAYER_SPEED;
-    //    }
-    //    else if (keyboard.isKeyDown(sf::Keyboard::S))
-    //    {
-    //        camera.position += backwardsVector(camera.rotation) * PLAYER_SPEED;
-    //    }
-    //    if (keyboard.isKeyDown(sf::Keyboard::A))
-    //    {
-    //        camera.position += leftVector(camera.rotation) * PLAYER_SPEED;
-    //    }
-    //    else if (keyboard.isKeyDown(sf::Keyboard::D))
-    //    {
-    //        camera.position += rightVector(camera.rotation) * PLAYER_SPEED;
-    //    }
-    //
-    //    if (!isMouseActive)
-    //    {
-    //        return;
-    //    }
-    //    static auto lastMousePosition = sf::Mouse::getPosition(window);
-    //    auto change = sf::Mouse::getPosition(window) - lastMousePosition;
-    //    camera.rotation.x -= static_cast<float>(change.y * 0.5);
-    //    camera.rotation.y += static_cast<float>(change.x * 0.5);
-    //    sf::Mouse::setPosition({(int)window.getSize().x / 2, (int)window.getSize().y /
-    //    2},
-    //                           window);
-    //    lastMousePosition.x = (int)window.getSize().x / 2;
-    //    lastMousePosition.y = (int)window.getSize().y / 2;
-    //
-    //    camera.rotation.x = glm::clamp(camera.rotation.x, -89.9f, 89.9f);
-    //    camera.rotation.y = (int)camera.rotation.y % 360;
-    //}
-    // else
-    //{
+        if (keyboard.isKeyDown(sf::Keyboard::Space))
+        {
+            m_world.breakBlock(m_player.position.x, m_player.position.y);
+        }
 
-    if (keyboard.isKeyDown(sf::Keyboard::W))
-    {
-        m_playerVelocity.y += PLAYER_SPEED;
-    }
-    else if (keyboard.isKeyDown(sf::Keyboard::S))
-    {
-        m_playerVelocity.y -= PLAYER_SPEED;
-    }
-    if (keyboard.isKeyDown(sf::Keyboard::A))
-    {
-        m_playerVelocity.x -= PLAYER_SPEED;
-    }
-    else if (keyboard.isKeyDown(sf::Keyboard::D))
-    {
-        m_playerVelocity.x += PLAYER_SPEED;
-    }
-
-    if (keyboard.isKeyDown(sf::Keyboard::Space))
-    {
-        m_world.breakBlock(m_player.position.x, m_player.position.y);
-    }
-
-    if (keyboard.isKeyDown(sf::Keyboard::U))
-    {
-        m_world.placeBlock(m_player.position.x, m_player.position.y,
-                           VoxelType::TEST_TORCH);
+        if (keyboard.isKeyDown(sf::Keyboard::U))
+        {
+            m_world.placeBlock(m_player.position.x, m_player.position.y,
+                               VoxelType::TEST_TORCH);
+        }
     }
 }
 
 void Hoperload::onUpdate(const sf::Time& time)
 {
-    m_camera.update();
+    m_camera.update(!freecam);
+
     if (!freecam)
     {
         m_player.position += m_playerVelocity * time.asSeconds();
@@ -157,7 +120,7 @@ void Hoperload::onRender()
 
     auto lightModel = createModelMatrix(m_player);
     m_sceneShader.set("modelMatrix", lightModel);
-    m_lightCube.getRendable().drawElements();
+    m_playerCube.getRendable().drawElements();
 
     m_world.render(m_camera);
 }

@@ -124,7 +124,7 @@ void Chunk::floodLights()
             auto voxel = qGetVoxel({x, y, 0});
             if (voxel == AIR)
             {
-                floodSunlight({x, y, 1}, 16);
+                floodSunlight({x, y, 1}, 15);
             }
         }
     }
@@ -152,7 +152,7 @@ void Chunk::floodSunlight(VoxelPosition position, int lightLevel)
     }
     else
     {
-        lightLevel -= 4;
+        lightLevel -= 3;
     }
 
     if (lightLevel <= 0)
@@ -192,7 +192,7 @@ void Chunk::floodBlockLight(VoxelPosition position, int lightLevel)
     }
     else
     {
-        lightLevel -= 4;
+        lightLevel -= 3;
     }
 
     if (lightLevel <= 0)
