@@ -34,14 +34,13 @@ World::World()
         }
     }
 
-    m_chunkBuildThread = std::thread([&]{
-        doChunkBuildThread();
-    });
+    m_chunkBuildThread = std::thread([&] { doChunkBuildThread(); });
 }
 
-World::~World() 
+World::~World()
 {
     m_isRunning = false;
+    m_buildCondition.notify_one();
     m_chunkBuildThread.join();
 }
 
@@ -59,6 +58,7 @@ void World::placeBlock(int x, int y, VoxelID id)
     std::unique_lock<std::mutex> lock(m_lock);
     auto& chunk = m_chunkMap.setVoxel(worldToGlobalVoxelPosition({x, y, 1}), id);
     m_chunkBuildQueue.emplace(chunk.position());
+    m_buildCondition.notify_one();
 }
 
 int World::getLightLevel(int x, int y)
@@ -67,14 +67,18 @@ int World::getLightLevel(int x, int y)
     return m_chunkMap.getLightLevel(worldToGlobalVoxelPosition({x, y, 1}));
 }
 
-void World::doChunkBuildThread() 
+void World::doChunkBuildThread()
 {
-    while(m_isRunning) {
+    while (m_isRunning)
+    {
         std::unique_lock<std::mutex> lock(m_lock);
-        if (!m_chunkBuildQueue.empty()) {
+        m_buildCondition.wait(lock);
+
+        if (!m_chunkBuildQueue.empty())
+        {
             auto itr = m_chunkBuildQueue.begin();
             auto& chunk = m_chunkMap.getChunk(*itr);
-            
+
             chunk.resetLights();
             chunk.floodLights();
 
@@ -84,7 +88,6 @@ void World::doChunkBuildThread()
         }
     }
 }
-
 
 /*
 .emplace(std::piecewise_construct, std::forward_as_tuple(chunk),
@@ -105,7 +108,8 @@ void World::render(const Camera& camera)
     for (auto& [position, chunk] : m_chunkRendersList)
     {
         auto itr = m_chunkBufferQueue.find(position);
-        if (itr != m_chunkBufferQueue.end()) {
+        if (itr != m_chunkBufferQueue.end())
+        {
             VertexArray chunkVertexArray;
             chunkVertexArray.bufferMesh(itr->second);
             m_chunkRendersList[position].~VertexArray();

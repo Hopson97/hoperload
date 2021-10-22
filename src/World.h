@@ -3,9 +3,10 @@
 #include "Chunks/ChunkMap.h"
 #include "Graphics/GLWrappers.h"
 #include <atomic>
-#include <thread>
+#include <condition_variable>
 #include <mutex>
 #include <set>
+#include <thread>
 
 class Camera;
 
@@ -38,4 +39,5 @@ class World
     std::atomic<bool> m_isRunning{true};
     std::thread m_chunkBuildThread;
     std::mutex m_lock;
+    std::condition_variable m_buildCondition;
 };
