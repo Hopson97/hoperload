@@ -79,7 +79,6 @@ void World::doChunkBuildThread()
             auto itr = m_chunkBuildQueue.begin();
             auto& chunk = m_chunkMap.getChunk(*itr);
 
-            chunk.resetLights();
             chunk.floodLights();
 
             ChunkMesh mesh = createGreedyChunkMesh(chunk);

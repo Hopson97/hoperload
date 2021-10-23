@@ -48,6 +48,7 @@ void Chunk::qSetVoxel(const VoxelPosition& voxelPosition, VoxelID voxelId)
     if (itr != m_lightPositions.end())
     {
         m_lightPositions.erase(itr);
+        resetLights();
     }
 
     if (getVoxelType(static_cast<VoxelType>(voxelId)).isLight)
