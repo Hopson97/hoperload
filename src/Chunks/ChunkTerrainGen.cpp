@@ -53,7 +53,8 @@ void createChunkTerrain(Chunk& chunk, int chunkX, int chunkY, int worldWidth,
                 {
                     chunk.qSetVoxel({x, y, 1}, DIRT);
                 }
-                else if (rand() % 64 > 10) {
+                else if (rand() % 64 > 10)
+                {
                     chunk.qSetVoxel({x, y, 1}, STONE);
                 }
             }

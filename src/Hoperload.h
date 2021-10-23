@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Graphics/GLWrappers.h"
 #include "Maths.h"
+#include "Player.h"
 #include "World.h"
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Window.hpp>
@@ -27,9 +28,7 @@ class Hoperload
     VertexArray m_playerCube;
     Texture2D m_texture;
 
-    Transform m_player;
-    glm::vec3 m_playerVelocity;
-
     World m_world;
+    Player m_player;
     Camera m_camera;
 };

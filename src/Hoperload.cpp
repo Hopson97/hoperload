@@ -2,8 +2,8 @@
 
 #include "Chunks/Conversions.h"
 #include "Chunks/Voxels.h"
-#include "Utility.h"
 #include "GUI.h"
+#include "Utility.h"
 
 namespace
 {
@@ -22,8 +22,7 @@ Hoperload::Hoperload()
     m_playerCube.bufferMesh(createCubeMesh({0.8f, 0.8f, 0.8f}));
     m_texture.loadFromFile("OpenGLLogo.png", 8);
 
-    m_player = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2 + 1, 1}, {0, 0, 0}};
-    m_camera.hookTransform(&m_player);
+    m_camera.hookTransform(&m_player.getTransform());
 }
 
 bool freecam = false;
@@ -57,51 +56,34 @@ void Hoperload::onEvent(const sf::Event& e)
 void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window,
                         bool isMouseActive)
 {
-    float PLAYER_SPEED = 0.5f;
     if (freecam)
     {
         m_camera.inputFreeCamera(keyboard, window);
     }
     else
     {
-        if (keyboard.isKeyDown(sf::Keyboard::W))
-        {
-            m_playerVelocity.y += PLAYER_SPEED;
-        }
-        else if (keyboard.isKeyDown(sf::Keyboard::S))
-        {
-            m_playerVelocity.y -= PLAYER_SPEED;
-        }
-        if (keyboard.isKeyDown(sf::Keyboard::A))
-        {
-            m_playerVelocity.x -= PLAYER_SPEED;
-        }
-        else if (keyboard.isKeyDown(sf::Keyboard::D))
-        {
-            m_playerVelocity.x += PLAYER_SPEED;
-        }
+        m_player.input(keyboard, window);
 
+        auto& position = m_player.getTransform().position;
         if (keyboard.isKeyDown(sf::Keyboard::Space))
         {
-            m_world.breakBlock(m_player.position.x, m_player.position.y);
+            m_world.breakBlock(position.x, position.y);
         }
 
         if (keyboard.isKeyDown(sf::Keyboard::U))
         {
-            m_world.placeBlock(m_player.position.x, m_player.position.y,
-                               VoxelType::TEST_TORCH);
+            m_world.placeBlock(position.x, position.y, VoxelType::TEST_TORCH);
         }
     }
 }
 
-void Hoperload::onUpdate(const sf::Time& time)
+void Hoperload::onUpdate(const sf::Time& dt)
 {
     m_camera.update(!freecam);
 
     if (!freecam)
     {
-        m_player.position += m_playerVelocity * time.asSeconds();
-        m_playerVelocity *= 0.98;
+        m_player.update(dt, m_world);
     }
 }
 
@@ -117,10 +99,13 @@ void Hoperload::onRender()
     m_sceneShader.set("projectionViewMatrix", m_camera.getProjectionView());
 
     glEnable(GL_CULL_FACE);
-    float light = m_world.getLightLevel(m_player.position.x, m_player.position.y) / 15.0f;
+    auto& playerTransform = m_player.getTransform();
+    float light =
+        m_world.getLightLevel(playerTransform.position.x, playerTransform.position.y) /
+        15.0f;
     m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
-    auto lightModel = createModelMatrix(m_player);
+    auto lightModel = createModelMatrix(playerTransform);
     m_sceneShader.set("modelMatrix", lightModel);
     m_playerCube.getRendable().drawElements();
 
