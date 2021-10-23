@@ -23,6 +23,7 @@ class World
     void placeBlock(int x, int y, VoxelID id);
 
     int getLightLevel(int x, int y);
+    VoxelID getVoxel(int x, int y) const;
 
   private:
     void doChunkBuildThread();

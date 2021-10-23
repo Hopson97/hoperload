@@ -67,7 +67,14 @@ void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window,
         auto& position = m_player.getTransform().position;
         if (keyboard.isKeyDown(sf::Keyboard::Space))
         {
-            m_world.breakBlock(position.x, position.y);
+            for (int y = -1; y < 1; y++)
+            {
+
+                for (int x = -1; x < 1; x++)
+                {
+                    m_world.breakBlock(position.x + x, position.y + y);
+                }
+            }
         }
 
         if (keyboard.isKeyDown(sf::Keyboard::U))
@@ -99,12 +106,14 @@ void Hoperload::onRender()
     m_sceneShader.set("projectionViewMatrix", m_camera.getProjectionView());
 
     glEnable(GL_CULL_FACE);
-    auto& playerTransform = m_player.getTransform();
+    auto playerTransform = m_player.getTransform();
     float light =
         m_world.getLightLevel(playerTransform.position.x, playerTransform.position.y) /
         15.0f;
     m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
+    playerTransform.position.x -= 0.5;
+    playerTransform.position.y -= 0.5;
     auto lightModel = createModelMatrix(playerTransform);
     m_sceneShader.set("modelMatrix", lightModel);
     m_playerCube.getRendable().drawElements();

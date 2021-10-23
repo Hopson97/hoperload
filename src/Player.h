@@ -18,6 +18,9 @@ class Player
     const Transform& getTransform() const;
 
   private:
+    void resolveCollisions(const World& world, const glm::vec3& vel);
+
     Transform m_transform;
     glm::vec3 m_velocity;
+    bool m_isOnGround = false;
 };

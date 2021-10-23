@@ -67,6 +67,11 @@ int World::getLightLevel(int x, int y)
     return m_chunkMap.getLightLevel(worldToGlobalVoxelPosition({x, y, 1}));
 }
 
+VoxelID World::getVoxel(int x, int y) const
+{
+    return m_chunkMap.getVoxel({x, y, 1});
+}
+
 void World::doChunkBuildThread()
 {
     while (m_isRunning)
