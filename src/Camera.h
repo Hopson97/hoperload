@@ -23,7 +23,7 @@ struct Camera
   private:
     const Transform* mp_hook = nullptr;
     Transform m_transform;
-    float m_zoom = 12;
+    float m_zoom = 9;
 
     ViewFrustum m_frustum;
 

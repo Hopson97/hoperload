@@ -97,6 +97,8 @@ void Hoperload::onUpdate(const sf::Time& dt)
 
 void Hoperload::onRender()
 {
+    glEnable(GL_DEPTH_TEST);
+
     setClearColour(COLOUR_SKY_BLUE);
 
     Framebuffer::unbind();

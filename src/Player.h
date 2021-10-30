@@ -6,7 +6,8 @@
 class Keyboard;
 class World;
 
-enum class PlayerState {
+enum class PlayerState
+{
     Exploring,
     Digging,
 };

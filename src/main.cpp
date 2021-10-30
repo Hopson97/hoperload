@@ -64,7 +64,6 @@ int main()
             game.onUpdate(elapsed);
         }
 
-        glEnable(GL_DEPTH_TEST);
         game.onRender();
         game.onGUI();
         guiEndFrame();

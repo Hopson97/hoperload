@@ -10,7 +10,7 @@ Camera::Camera()
 {
     float aspect = (float)WIDTH / (float)HEIGHT;
 
-    m_projectionMatrix = createProjectionMatrix(aspect, 80.0f);
+    m_projectionMatrix = createProjectionMatrix(aspect, 90.0f);
     m_transform = {{0, 0, 0}, {0, 270, 0}};
 }
 
