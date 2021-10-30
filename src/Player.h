@@ -12,6 +12,13 @@ enum class PlayerState
     Digging,
 };
 
+struct Particle
+{
+    Transform transform;
+    glm::vec3 direction;
+    float lifetime;
+};
+
 class Player
 {
   public:
@@ -19,7 +26,7 @@ class Player
 
     void input(const Keyboard& keyboard, const sf::Window& window);
 
-    void update(const sf::Time& dt);
+    void update(const sf::Time& dt, std::vector<Particle>& particles);
 
     void gui();
 

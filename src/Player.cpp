@@ -4,6 +4,7 @@
 #include "Utility.h"
 #include "World.h"
 #include <cmath>
+#include <random>
 
 int worldHeight = 14;
 
@@ -64,7 +65,7 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
     }
 }
 
-void Player::update(const sf::Time& dt)
+void Player::update(const sf::Time& dt, std::vector<Particle>& particles)
 {
     float delta = dt.asSeconds();
 
@@ -88,18 +89,31 @@ void Player::update(const sf::Time& dt)
     }
     else if (m_state == PlayerState::Digging)
     {
+
         m_velocity = glm::vec3{0.0f};
         m_transform.position.x += m_digDirection.x * m_digSpeed * dt.asSeconds();
         m_transform.position.y += m_digDirection.y * m_digSpeed * dt.asSeconds();
         m_digProgress +=
             std::abs((m_digDirection.x + m_digDirection.y) * m_digSpeed * dt.asSeconds());
 
+        for (int i = 0; i < 5; i++)
+        {
+            Particle p;
+            p.transform.position =
+                m_transform.position +
+                glm::vec3{Player::box.x / 2.0f, -Player::box.y / 2.0f, Player::box.z};
+            float angle = (std::rand() % 360) * 3.14f / 180.f;
+            p.direction = glm::vec3{std::cos(angle), std::sin(angle), rand() % 2 + 2};
+            p.lifetime = rand() % 5;
+
+            particles.push_back(p);
+        }
+
         if (m_digProgress > 0.95)
         {
             m_state = PlayerState::Exploring;
 
             m_pWorld->breakBlock(m_digLocation.x, m_digLocation.y);
-
         }
     }
 }

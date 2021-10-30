@@ -4,6 +4,7 @@
 #include "Chunks/Voxels.h"
 #include "GUI.h"
 #include "Utility.h"
+#include <iostream>
 
 namespace
 {
@@ -21,6 +22,7 @@ Hoperload::Hoperload()
 {
     m_sceneShader.loadFromFile("SceneVertex.glsl", "SceneFragment.glsl");
     m_playerCube.bufferMesh(createCubeMesh(Player::box));
+    m_particleCube.bufferMesh(createCubeMesh({0.1, 0.1, 0.1}));
     m_texture.loadFromFile("OpenGLLogo.png", 8);
 
     m_camera.hookTransform(&m_player.getTransform());
@@ -91,7 +93,24 @@ void Hoperload::onUpdate(const sf::Time& dt)
 
     if (!freecam)
     {
-        m_player.update(dt);
+        m_player.update(dt, m_particles);
+    }
+
+    for (auto itr = m_particles.begin(); itr != m_particles.end();)
+    {
+
+        itr->transform.position += itr->direction * dt.asSeconds();
+        itr->direction.y -= 3 * dt.asSeconds();
+
+        itr->lifetime -= dt.asSeconds();
+        if (itr->lifetime < 0)
+        {
+            itr = m_particles.erase(itr);
+        }
+        else
+        {
+            itr++;
+        }
     }
 }
 
@@ -119,9 +138,14 @@ void Hoperload::onRender()
 
     playerTransform.position.z += 0.2;
     playerTransform.position.y -= Player::box.y;
-    auto lightModel = createModelMatrix(playerTransform);
-    m_sceneShader.set("modelMatrix", lightModel);
+    m_sceneShader.set("modelMatrix", createModelMatrix(playerTransform));
     m_playerCube.getRendable().drawElements();
+
+    for (auto& particle : m_particles)
+    {
+        m_sceneShader.set("modelMatrix", createModelMatrix(particle.transform));
+        m_particleCube.getRendable().drawElements();
+    }
 }
 
 void Hoperload::onGUI()

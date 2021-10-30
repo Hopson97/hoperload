@@ -26,9 +26,12 @@ class Hoperload
   private:
     Shader m_sceneShader;
     VertexArray m_playerCube;
+    VertexArray m_particleCube;
     Texture2D m_texture;
 
     World m_world;
     Player m_player;
     Camera m_camera;
+
+    std::vector<Particle> m_particles;
 };
