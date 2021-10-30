@@ -141,13 +141,15 @@ void Chunk::floodSunlight(VoxelPosition position, int lightLevel)
     setSunlight(position, lightLevel);
     setSunlight(position + glm::ivec3{0, 0, -1}, std::max(lightLevel - 2, 1));
 
-    auto v = getVoxel(position);
-    if (v == AIR)
+    auto type = getVoxel(position);
+    auto& voxelInfo = getVoxelType(static_cast<VoxelType>(type));
+
+    if (voxelInfo.isTransparent)
     {
 
         lightLevel -= 1;
     }
-    else if (v == WATER)
+    else if (type == WATER)
     {
         lightLevel -= 2;
     }
@@ -181,13 +183,15 @@ void Chunk::floodBlockLight(VoxelPosition position, int lightLevel)
     setBlockLight(position, lightLevel);
     setBlockLight(position + glm::ivec3{0, 0, -1}, std::max(lightLevel - 2, 1));
 
-    auto v = getVoxel(position);
-    if (v == AIR)
+    auto type = getVoxel(position);
+    auto& voxelInfo = getVoxelType(static_cast<VoxelType>(type));
+
+    if (voxelInfo.isTransparent)
     {
 
         lightLevel -= 1;
     }
-    else if (v == WATER)
+    else if (type == WATER)
     {
         lightLevel -= 2;
     }

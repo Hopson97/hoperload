@@ -22,13 +22,14 @@ struct Voxel
 {
     Voxel() = default;
     Voxel(const char* name, GLuint textureTop, GLuint textureSide, GLuint textureBottom,
-          bool isTransparent, bool isLight = false)
+          bool isTransparent, bool isLight, bool collidable)
         : name{name}
         , textureTop{textureTop}
         , textureSide{textureSide}
         , textureBottom{textureBottom}
         , isTransparent(isTransparent)
         , isLight(isLight)
+        , collidable(collidable)
     {
     }
     const char* name;
@@ -38,6 +39,7 @@ struct Voxel
 
     bool isTransparent;
     bool isLight;
+    bool collidable;
 };
 
 void initVoxelSystem(TextureArray2D& textureArray);

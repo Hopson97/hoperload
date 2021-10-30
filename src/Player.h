@@ -19,6 +19,8 @@ class Player
 
     const Transform& getTransform() const;
 
+    static inline glm::vec3 box{0.5f, 0.5f, 0.5f};
+
   private:
     void resolveCollisions(const glm::vec3& vel);
 

@@ -78,20 +78,14 @@ const Transform& Player::getTransform() const
     return m_transform;
 }
 
-struct
-{
-    glm::vec3 dimensions{0.5f, 0.5f, 0.5f};
-} box;
-
 void Player::resolveCollisions(const glm::vec3& vel)
 {
     auto& position = m_transform.position;
-    for (int x = position.x - box.dimensions.x; x < position.x + box.dimensions.x; x++)
+    for (int x = position.x; x < position.x + Player::box.x; x++)
     {
-        for (int y = position.y - box.dimensions.y; y < position.y + 0.7; y++)
+        for (int y = position.y - Player::box.y; y < position.y; y++)
         {
-            for (int z = position.z - box.dimensions.z; z < position.z + box.dimensions.z;
-                 z++)
+            for (int z = position.z; z < position.z + Player::box.z; z++)
             {
                 const auto& voxel = getVoxelType((VoxelType)m_pWorld->getVoxel(x, y));
 
@@ -99,24 +93,24 @@ void Player::resolveCollisions(const glm::vec3& vel)
                 {
                     if (vel.y > 0)
                     {
-                        position.y = y - box.dimensions.y;
+                        position.y = y;
                         m_velocity.y = 0;
                     }
                     else if (vel.y < 0)
                     {
                         m_isOnGround = true;
-                        position.y = y + box.dimensions.y + 1;
+                        position.y = y + Player::box.y + 1;
                         m_velocity.y = 0;
                     }
 
                     if (vel.x > 0)
                     {
-                        position.x = x - box.dimensions.x;
+                        position.x = x - Player::box.x;
                         m_velocity.x = 0;
                     }
                     else if (vel.x < 0)
                     {
-                        position.x = x + box.dimensions.x + 1;
+                        position.x = x + 1;
                         m_velocity.x = 0;
                     }
                 }

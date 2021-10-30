@@ -20,7 +20,7 @@ Hoperload::Hoperload()
     : m_player(m_world)
 {
     m_sceneShader.loadFromFile("SceneVertex.glsl", "SceneFragment.glsl");
-    m_playerCube.bufferMesh(createCubeMesh({0.5f, 0.5f, 0.5f}));
+    m_playerCube.bufferMesh(createCubeMesh(Player::box));
     m_texture.loadFromFile("OpenGLLogo.png", 8);
 
     m_camera.hookTransform(&m_player.getTransform());
@@ -113,7 +113,7 @@ void Hoperload::onRender()
         15.0f;
     m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
-    playerTransform.position.y -= 0.5;
+    playerTransform.position.y -= Player::box.y;
     auto lightModel = createModelMatrix(playerTransform);
     m_sceneShader.set("modelMatrix", lightModel);
     m_playerCube.getRendable().drawElements();
