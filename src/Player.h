@@ -28,6 +28,8 @@ class Player
     static inline glm::vec3 box{0.9f, 0.9f, 0.9f};
 
   private:
+    void beginDig(int offsetX, int offsetY);
+
     void resolveCollisions(const glm::vec3& vel);
 
     Transform m_transform;
@@ -37,6 +39,7 @@ class Player
 
     PlayerState m_state = PlayerState::Exploring;
     glm::vec2 m_digDirection{0.0f, 0.0f};
+    glm::ivec2 m_digLocation;
     float m_digSpeed = 1.5f;
     float m_digProgress = 0;
 

@@ -27,24 +27,7 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
                                                  voxelX + offsetX, voxelY + offsetY))
                                     .collidable)
             {
-                m_digDirection = {offsetX, offsetY};
-                m_state = PlayerState::Digging;
-                m_digProgress = 0;
-                if (offsetY)
-                {
-
-                    if (m_transform.position.x - std::floor(m_transform.position.x) < 0.5)
-                    {
-                        m_transform.position.x = std::floor(m_transform.position.x);
-                    }
-                    else
-                    {
-                        m_transform.position.x = std::ceil(m_transform.position.x);
-                        offsetX += 1;
-                    }
-                }
-                m_pWorld->breakBlock(voxelX + offsetX, voxelY + offsetY);
-
+                beginDig(offsetX, offsetY);
                 return true;
             }
             return false;
@@ -114,6 +97,9 @@ void Player::update(const sf::Time& dt)
         if (m_digProgress > 0.95)
         {
             m_state = PlayerState::Exploring;
+
+            m_pWorld->breakBlock(m_digLocation.x, m_digLocation.y);
+
         }
     }
 }
@@ -138,6 +124,31 @@ void Player::gui()
 const Transform& Player::getTransform() const
 {
     return m_transform;
+}
+
+void Player::beginDig(int offsetX, int offsetY)
+{
+
+    int voxelX = static_cast<int>(m_transform.position.x);
+    int voxelY = static_cast<int>(m_transform.position.y);
+
+    m_digDirection = {offsetX, offsetY};
+    m_state = PlayerState::Digging;
+    m_digProgress = 0;
+    if (offsetY)
+    {
+
+        if (m_transform.position.x - std::floor(m_transform.position.x) < 0.5)
+        {
+            m_transform.position.x = std::floor(m_transform.position.x);
+        }
+        else
+        {
+            m_transform.position.x = std::ceil(m_transform.position.x);
+            offsetX += 1;
+        }
+    }
+    m_digLocation = {voxelX + offsetX, voxelY + offsetY};
 }
 
 void Player::resolveCollisions(const glm::vec3& vel)

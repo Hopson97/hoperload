@@ -104,6 +104,8 @@ void Hoperload::onRender()
     Framebuffer::unbind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    m_world.render(m_camera);
+
     // Normal stuff
     m_sceneShader.bind();
     m_sceneShader.set("projectionViewMatrix", m_camera.getProjectionView());
@@ -115,12 +117,11 @@ void Hoperload::onRender()
         15.0f;
     m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
+    playerTransform.position.z += 0.2;
     playerTransform.position.y -= Player::box.y;
     auto lightModel = createModelMatrix(playerTransform);
     m_sceneShader.set("modelMatrix", lightModel);
     m_playerCube.getRendable().drawElements();
-
-    m_world.render(m_camera);
 }
 
 void Hoperload::onGUI()

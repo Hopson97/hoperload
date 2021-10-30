@@ -155,7 +155,7 @@ void Chunk::floodSunlight(VoxelPosition position, int lightLevel)
     }
     else
     {
-        lightLevel -= 3;
+        lightLevel -= 4;
     }
 
     if (lightLevel <= 0)
@@ -197,7 +197,7 @@ void Chunk::floodBlockLight(VoxelPosition position, int lightLevel)
     }
     else
     {
-        lightLevel -= 3;
+        lightLevel -= 4;
     }
 
     if (lightLevel <= 0)
