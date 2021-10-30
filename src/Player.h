@@ -6,6 +6,11 @@
 class Keyboard;
 class World;
 
+enum class PlayerState {
+    Exploring,
+    Digging,
+};
+
 class Player
 {
   public:
@@ -19,7 +24,7 @@ class Player
 
     const Transform& getTransform() const;
 
-    static inline glm::vec3 box{0.5f, 0.5f, 0.5f};
+    static inline glm::vec3 box{0.9f, 0.9f, 0.9f};
 
   private:
     void resolveCollisions(const glm::vec3& vel);
@@ -28,6 +33,11 @@ class Player
     glm::vec3 m_velocity;
     bool m_isOnGround = false;
     bool m_isTouchingWall = false;
+
+    PlayerState m_state = PlayerState::Exploring;
+    glm::vec2 m_digDirection{0.0f, 0.0f};
+    float m_digSpeed = 1.5f;
+    float m_digProgress = 0;
 
     World* m_pWorld;
 };
