@@ -17,27 +17,46 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
 {
     float PLAYER_SPEED = 0.5f;
 
-    int voxelX = m_transform.position.x;
-    int voxelY = m_transform.position.y;
+    int voxelX = static_cast<int>(m_transform.position.x);
+    int voxelY = static_cast<int>(m_transform.position.y);
+
+    auto tryDigHole = [&](int offsetX, int offsetY) {
+        if (m_isOnGround && getVoxelType((VoxelType)m_pWorld->getVoxel(voxelX + offsetX,
+                                                                       voxelY + offsetY))
+                                .collidable)
+        {
+            m_pWorld->breakBlock(voxelX + offsetX, voxelY + offsetY);
+            return true;
+        }
+        return false;
+    };
 
     if (keyboard.isKeyDown(sf::Keyboard::W))
     {
         m_velocity.y += PLAYER_SPEED;
     }
-    else if (keyboard.isKeyDown(sf::Keyboard::S))
+    else if (keyboard.isKeyDown(sf::Keyboard::S) && m_isOnGround)
     {
-        if (getVoxelType((VoxelType)m_pWorld->getVoxel(voxelX, voxelY - 1)).collidable)
+        if (tryDigHole(0, -1))
         {
-            m_pWorld->breakBlock(voxelX, voxelY - 1);
+            return;
         }
     }
     if (keyboard.isKeyDown(sf::Keyboard::A))
     {
-
+        if (m_isTouchingWall && tryDigHole(-1, 0))
+        {
+            return;
+        }
         m_velocity.x -= PLAYER_SPEED;
     }
     else if (keyboard.isKeyDown(sf::Keyboard::D))
     {
+
+        if (m_isTouchingWall && tryDigHole(1, 0))
+        {
+            return;
+        }
         m_velocity.x += PLAYER_SPEED;
     }
 }
@@ -51,6 +70,7 @@ void Player::update(const sf::Time& dt)
         m_velocity.y -= 20 * delta;
     }
     m_isOnGround = false;
+    m_isTouchingWall = false;
 
     m_transform.position.x += m_velocity.x * delta;
     resolveCollisions({m_velocity.x * delta, 0, 0});
@@ -105,11 +125,13 @@ void Player::resolveCollisions(const glm::vec3& vel)
 
                     if (vel.x > 0)
                     {
+                        m_isTouchingWall = true;
                         position.x = x - Player::box.x;
                         m_velocity.x = 0;
                     }
                     else if (vel.x < 0)
                     {
+                        m_isTouchingWall = true;
                         position.x = x + 1;
                         m_velocity.x = 0;
                     }

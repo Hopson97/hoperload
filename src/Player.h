@@ -27,6 +27,7 @@ class Player
     Transform m_transform;
     glm::vec3 m_velocity;
     bool m_isOnGround = false;
+    bool m_isTouchingWall = false;
 
     World* m_pWorld;
 };
