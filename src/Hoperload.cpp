@@ -17,9 +17,10 @@ int toIndex(int x, int y)
 }
 
 Hoperload::Hoperload()
+    : m_player(m_world)
 {
     m_sceneShader.loadFromFile("SceneVertex.glsl", "SceneFragment.glsl");
-    m_playerCube.bufferMesh(createCubeMesh({0.8f, 0.8f, 0.8f}));
+    m_playerCube.bufferMesh(createCubeMesh({0.5f, 0.5f, 0.5f}));
     m_texture.loadFromFile("OpenGLLogo.png", 8);
 
     m_camera.hookTransform(&m_player.getTransform());
@@ -90,7 +91,7 @@ void Hoperload::onUpdate(const sf::Time& dt)
 
     if (!freecam)
     {
-        m_player.update(dt, m_world);
+        m_player.update(dt);
     }
 }
 
@@ -112,7 +113,6 @@ void Hoperload::onRender()
         15.0f;
     m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
-    playerTransform.position.x -= 0.5;
     playerTransform.position.y -= 0.5;
     auto lightModel = createModelMatrix(playerTransform);
     m_sceneShader.set("modelMatrix", lightModel);
@@ -124,4 +124,5 @@ void Hoperload::onRender()
 void Hoperload::onGUI()
 {
     guiDebugScreen(m_camera.getTransform());
+    m_player.gui();
 }

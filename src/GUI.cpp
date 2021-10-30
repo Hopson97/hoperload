@@ -3,8 +3,6 @@
 #include "Hoperload.h"
 #include "Maths.h"
 #include "Utility.h"
-#include <nuklearpp/nuklear_def.h>
-#include <nuklearpp/nuklear_sfml_gl3.h>
 
 #include <iomanip>
 #include <locale>
@@ -106,6 +104,11 @@ void guiDebugScreen(const Transform& transform)
         glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
     }
     nk_end(ctx);
+}
+
+struct nk_context* getGuiContext()
+{
+    return ctx;
 }
 
 SpriteRenderer::SpriteRenderer()

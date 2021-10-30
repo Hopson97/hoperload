@@ -7,6 +7,9 @@
 #include "Graphics/VertexArray.h"
 #include <glm/glm.hpp>
 
+#include <nuklearpp/nuklear_def.h>
+#include <nuklearpp/nuklear_sfml_gl3.h>
+
 struct Transform;
 struct TerrainGenOptions;
 struct GraphicsOptions;
@@ -21,6 +24,8 @@ void guiProcessEvent(sf::Event& event);
 void guiEndFrame();
 
 void guiDebugScreen(const Transform& transform);
+
+struct nk_context* getGuiContext();
 
 struct SpriteRenderer
 {

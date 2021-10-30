@@ -9,18 +9,22 @@ class World;
 class Player
 {
   public:
-    Player();
+    Player(World& world);
 
     void input(const Keyboard& keyboard, const sf::Window& window);
 
-    void update(const sf::Time& dt, const World& world);
+    void update(const sf::Time& dt);
+
+    void gui();
 
     const Transform& getTransform() const;
 
   private:
-    void resolveCollisions(const World& world, const glm::vec3& vel);
+    void resolveCollisions(const glm::vec3& vel);
 
     Transform m_transform;
     glm::vec3 m_velocity;
     bool m_isOnGround = false;
+
+    World* m_pWorld;
 };

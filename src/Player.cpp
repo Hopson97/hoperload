@@ -1,11 +1,14 @@
 #include "Player.h"
 #include "Chunks/Voxels.h"
+#include "GUI.h"
 #include "Utility.h"
 #include "World.h"
+#include <cmath>
 
 int worldHeight = 14;
 
-Player::Player()
+Player::Player(World& world)
+    : m_pWorld(&world)
 {
     m_transform = {{50, worldHeight * CHUNK_SIZE - CHUNK_SIZE / 2 + 1, 1}, {0, 0, 0}};
 }
@@ -14,16 +17,23 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
 {
     float PLAYER_SPEED = 0.5f;
 
+    int voxelX = m_transform.position.x;
+    int voxelY = m_transform.position.y;
+
     if (keyboard.isKeyDown(sf::Keyboard::W))
     {
         m_velocity.y += PLAYER_SPEED;
     }
     else if (keyboard.isKeyDown(sf::Keyboard::S))
     {
-        m_velocity.y -= PLAYER_SPEED;
+        if (getVoxelType((VoxelType)m_pWorld->getVoxel(voxelX, voxelY - 1)).collidable)
+        {
+            m_pWorld->breakBlock(voxelX, voxelY - 1);
+        }
     }
     if (keyboard.isKeyDown(sf::Keyboard::A))
     {
+
         m_velocity.x -= PLAYER_SPEED;
     }
     else if (keyboard.isKeyDown(sf::Keyboard::D))
@@ -32,7 +42,7 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
     }
 }
 
-void Player::update(const sf::Time& dt, const World& world)
+void Player::update(const sf::Time& dt)
 {
     float delta = dt.asSeconds();
 
@@ -43,12 +53,24 @@ void Player::update(const sf::Time& dt, const World& world)
     m_isOnGround = false;
 
     m_transform.position.x += m_velocity.x * delta;
-    resolveCollisions(world, {m_velocity.x * delta, 0, 0});
+    resolveCollisions({m_velocity.x * delta, 0, 0});
 
     m_transform.position.y += m_velocity.y * delta;
-    resolveCollisions(world, {0, m_velocity.y * delta, 0});
+    resolveCollisions({0, m_velocity.y * delta, 0});
 
-    m_velocity.x *= 0.98;
+    m_velocity.x *= 0.95;
+}
+
+void Player::gui()
+{
+    auto ctx = getGuiContext();
+    if (nk_begin(ctx, "Player", nk_rect(10, 150, 300, 130), 0))
+    {
+        nk_layout_row_dynamic(ctx, 12, 1);
+        nk_labelf(ctx, NK_STATIC, "Player Velcoity: (%.*f, %.*f, %.*f)", 2, m_velocity[0],
+                  2, m_velocity[1], 2, m_velocity[2]);
+    }
+    nk_end(ctx);
 }
 
 const Transform& Player::getTransform() const
@@ -61,7 +83,7 @@ struct
     glm::vec3 dimensions{0.5f, 0.5f, 0.5f};
 } box;
 
-void Player::resolveCollisions(const World& world, const glm::vec3& vel)
+void Player::resolveCollisions(const glm::vec3& vel)
 {
     auto& position = m_transform.position;
     for (int x = position.x - box.dimensions.x; x < position.x + box.dimensions.x; x++)
@@ -71,9 +93,9 @@ void Player::resolveCollisions(const World& world, const glm::vec3& vel)
             for (int z = position.z - box.dimensions.z; z < position.z + box.dimensions.z;
                  z++)
             {
-                auto voxel = world.getVoxel(x, y);
+                const auto& voxel = getVoxelType((VoxelType)m_pWorld->getVoxel(x, y));
 
-                if (voxel != AIR)
+                if (voxel.collidable)
                 {
                     if (vel.y > 0)
                     {
@@ -90,19 +112,12 @@ void Player::resolveCollisions(const World& world, const glm::vec3& vel)
                     if (vel.x > 0)
                     {
                         position.x = x - box.dimensions.x;
+                        m_velocity.x = 0;
                     }
                     else if (vel.x < 0)
                     {
                         position.x = x + box.dimensions.x + 1;
-                    }
-
-                    if (vel.z > 0)
-                    {
-                        position.z = z - box.dimensions.z;
-                    }
-                    else if (vel.z < 0)
-                    {
-                        position.z = z + box.dimensions.z + 1;
+                        m_velocity.x = 0;
                     }
                 }
             }
