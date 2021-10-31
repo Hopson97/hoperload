@@ -94,22 +94,22 @@ void Hoperload::onUpdate(const sf::Time& dt)
     if (!freecam)
     {
         m_player.update(dt, m_particles);
-    }
 
-    for (auto itr = m_particles.begin(); itr != m_particles.end();)
-    {
-
-        itr->transform.position += itr->direction * dt.asSeconds();
-        itr->direction.y -= 3 * dt.asSeconds();
-
-        itr->lifetime -= dt.asSeconds();
-        if (itr->lifetime < 0)
+        for (auto itr = m_particles.begin(); itr != m_particles.end();)
         {
-            itr = m_particles.erase(itr);
-        }
-        else
-        {
-            itr++;
+
+            itr->transform.position += itr->direction * dt.asSeconds();
+            itr->direction.y -= 3 * dt.asSeconds();
+
+            itr->lifetime -= dt.asSeconds();
+            if (itr->lifetime < 0)
+            {
+                itr = m_particles.erase(itr);
+            }
+            else
+            {
+                itr++;
+            }
         }
     }
 }
@@ -136,7 +136,7 @@ void Hoperload::onRender()
         15.0f;
     m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
-    playerTransform.position.z += 0.2;
+    playerTransform.position.z += Player::box.z / 2;
     playerTransform.position.y -= Player::box.y;
     m_sceneShader.set("modelMatrix", createModelMatrix(playerTransform));
     m_playerCube.getRendable().drawElements();
