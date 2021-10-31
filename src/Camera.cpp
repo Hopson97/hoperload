@@ -4,6 +4,8 @@
 
 namespace
 {
+    int worldHeight = 14;
+    int worldWidth = 4;
 } // namespace
 
 Camera::Camera()
@@ -60,7 +62,11 @@ void Camera::update(bool followHook)
     if (followHook)
     {
         assert(mp_hook);
-        m_transform.position = {mp_hook->position.x, mp_hook->position.y, m_zoom};
+
+        m_transform.position = {
+            glm::clamp(mp_hook->position.x, (float)CHUNK_SIZE / 2,
+                       (float)worldWidth * CHUNK_SIZE - CHUNK_SIZE / 2),
+            mp_hook->position.y, m_zoom};
         m_transform.rotation = {0, 270, 0};
     }
 }
