@@ -1,5 +1,7 @@
 #pragma once
 
+#define GLM_FORCE_SWIZZLE
+
 #include <array>
 #include <glm/common.hpp>
 #include <glm/glm.hpp>

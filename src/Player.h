@@ -32,7 +32,7 @@ class Player
 
     const Transform& getTransform() const;
 
-    static inline glm::vec3 box{0.9f, 0.9f, 0.9f};
+    static inline glm::vec3 box{0.7f, 0.7f, 0.7f};
 
   private:
     void beginDig(int offsetX, int offsetY);
@@ -46,8 +46,11 @@ class Player
 
     PlayerState m_state = PlayerState::Exploring;
     glm::vec2 m_digDirection{0.0f, 0.0f};
+
+    glm::vec2 m_digStartPosition;
+    glm::vec2 m_digTarget;
     glm::ivec2 m_digLocation;
-    float m_digSpeed = 1.5f;
+    float m_digSpeed = 3.5f;
     float m_digProgress = 0;
 
     World* m_pWorld;
