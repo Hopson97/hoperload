@@ -73,17 +73,6 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
     }
 }
 
-float lerp(float v0, float v1, float t)
-{
-    return v0 + t * (v1 - v0);
-}
-
-template <typename T>
-int sign(T val)
-{
-    return (T(0) < val) - (val < T(0));
-}
-
 void Player::update(const sf::Time& dt, std::vector<Particle>& particles)
 {
     float delta = dt.asSeconds();
@@ -118,7 +107,6 @@ void Player::update(const sf::Time& dt, std::vector<Particle>& particles)
             Particle p;
             p.transform.position = pos + glm::vec3{Player::box.x / 2.0f,
                                                    -Player::box.y / 2.0f, Player::box.z};
-            float angle = (std::rand() % 360) * 3.14f / 180.f;
             p.direction = {m_digDirection.x == 0
                                ? rand() % 4 - 2
                                : m_digDirection.x * 2.5f * m_digSpeed * -(rand() % 2 - 1),

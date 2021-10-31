@@ -13,16 +13,6 @@ struct Transform
     glm::vec3 rotation{0.0f};
 };
 
-glm::mat4 createModelMatrix(const Transform& transform);
-glm::mat4 createOrbitModelMatrix(const Transform& transform);
-glm::mat4 createViewMartix(const Transform& transform, const glm::vec3& up);
-glm::mat4 createProjectionMatrix(float aspectRatio, float fov);
-
-glm::vec3 forwardsVector(const glm::vec3& rotation);
-glm::vec3 backwardsVector(const glm::vec3& rotation);
-glm::vec3 leftVector(const glm::vec3& rotation);
-glm::vec3 rightVector(const glm::vec3& rotation);
-
 class ViewFrustum
 {
     struct Plane
@@ -39,3 +29,16 @@ class ViewFrustum
   private:
     std::array<Plane, 6> m_planes;
 };
+
+glm::mat4 createModelMatrix(const Transform& transform);
+glm::mat4 createOrbitModelMatrix(const Transform& transform);
+glm::mat4 createViewMartix(const Transform& transform, const glm::vec3& up);
+glm::mat4 createProjectionMatrix(float aspectRatio, float fov);
+
+glm::vec3 forwardsVector(const glm::vec3& rotation);
+glm::vec3 backwardsVector(const glm::vec3& rotation);
+glm::vec3 leftVector(const glm::vec3& rotation);
+glm::vec3 rightVector(const glm::vec3& rotation);
+
+
+float lerp(float v0, float v1, float t);
