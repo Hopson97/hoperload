@@ -176,8 +176,6 @@ void Player::beginDig(int offsetX, int offsetY)
     m_digStartPosition = m_transform.position.xy();
     m_digTarget =
         glm::vec2(voxelX + offsetX + Player::box.x / 4, voxelY + offsetY + Player::box.y);
-
-    std::cout << "\n";
 }
 
 void Player::resolveCollisions(const glm::vec3& vel)

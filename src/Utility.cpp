@@ -161,7 +161,6 @@ bool initWindow(sf::Window* window)
     window->create({1600, 900}, "Hoperload", sf::Style::Close, contextSettings);
     window->setPosition(
         {(int)sf::VideoMode::getDesktopMode().width / 2 + 150, HEIGHT / 16});
-    window->setMouseCursorVisible(false);
     if (!gladLoadGL())
     {
         printf("Error: Could not load OpenGL.");

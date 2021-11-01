@@ -38,6 +38,12 @@ void Hoperload::onEvent(const sf::Event& e)
             {
                 freecam = !freecam;
             }
+            if (e.key.code == sf::Keyboard::U)
+            {
+                auto& position = m_player.getTransform().position;
+
+                m_world.placeBlock(position.x, position.y, VoxelType::TEST_TORCH);
+            }
             break;
 
         case sf::Event::MouseWheelScrolled:
@@ -66,24 +72,6 @@ void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window,
     else
     {
         m_player.input(keyboard, window);
-
-        auto& position = m_player.getTransform().position;
-        if (keyboard.isKeyDown(sf::Keyboard::Space))
-        {
-            for (int y = -1; y < 1; y++)
-            {
-
-                for (int x = -1; x < 1; x++)
-                {
-                    m_world.breakBlock(position.x + x, position.y + y);
-                }
-            }
-        }
-
-        if (keyboard.isKeyDown(sf::Keyboard::U))
-        {
-            m_world.placeBlock(position.x, position.y, VoxelType::TEST_TORCH);
-        }
     }
 }
 

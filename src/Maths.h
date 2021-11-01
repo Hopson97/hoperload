@@ -40,5 +40,4 @@ glm::vec3 backwardsVector(const glm::vec3& rotation);
 glm::vec3 leftVector(const glm::vec3& rotation);
 glm::vec3 rightVector(const glm::vec3& rotation);
 
-
 float lerp(float v0, float v1, float t);
