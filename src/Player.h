@@ -40,18 +40,18 @@ class Player
     void resolveCollisions(const glm::vec3& vel);
 
     Transform m_transform;
-    glm::vec3 m_velocity;
+    glm::vec3 m_velocity{0.0f};
     bool m_isOnGround = false;
     bool m_isTouchingWall = false;
 
     PlayerState m_state = PlayerState::Exploring;
     glm::vec2 m_digDirection{0.0f, 0.0f};
 
-    glm::vec2 m_digStartPosition;
-    glm::vec2 m_digTarget;
-    glm::ivec2 m_digLocation;
+    glm::vec2 m_digStartPosition{0.0f};
+    glm::vec2 m_digTarget{0.0f};
+    glm::ivec2 m_digLocation{0};
     float m_digSpeed = 3.5f;
     float m_digProgress = 0;
 
-    World* m_pWorld;
+    World* m_pWorld = nullptr;
 };

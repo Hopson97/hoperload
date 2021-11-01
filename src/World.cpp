@@ -33,7 +33,6 @@ World::World()
             m_chunkRendersList[chunk.position()] = std::move(chunkVertexArray);
         }
     }
-
     m_chunkBuildThread = std::thread([&] { doChunkBuildThread(); });
 }
 
