@@ -34,6 +34,8 @@ class Player
 
     static inline glm::vec3 box{0.7f, 0.7f, 0.7f};
 
+    bool isDigging() const;
+
   private:
     void beginDig(int offsetX, int offsetY);
 

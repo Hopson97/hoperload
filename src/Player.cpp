@@ -24,7 +24,8 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
         int voxelX = static_cast<int>(m_transform.position.x);
         int voxelY = static_cast<int>(m_transform.position.y);
 
-        auto tryDigHole = [&](int offsetX, int offsetY) {
+        auto tryDigHole = [&](int offsetX, int offsetY)
+        {
             int voxelXOffset = offsetX;
             if (offsetY &&
                 m_transform.position.x - std::floor(m_transform.position.x) > 0.5)
@@ -150,6 +151,11 @@ void Player::gui()
 const Transform& Player::getTransform() const
 {
     return m_transform;
+}
+
+bool Player::isDigging() const
+{
+    return m_state == PlayerState::Digging;
 }
 
 void Player::beginDig(int offsetX, int offsetY)

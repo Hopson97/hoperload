@@ -38,7 +38,7 @@ void Hoperload::onEvent(const sf::Event& e)
             {
                 freecam = !freecam;
             }
-            if (e.key.code == sf::Keyboard::U)
+            if (e.key.code == sf::Keyboard::U && !m_player.isDigging())
             {
                 auto& position = m_player.getTransform().position;
 
