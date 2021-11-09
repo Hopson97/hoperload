@@ -54,7 +54,7 @@ namespace
 } // namespace
 
 void ChunkMesh::addVoxelFace(const VoxelMeshFace& face, const ChunkPosition& chunkPos,
-                             const VoxelPosition& blockPos, GLfloat textureId,
+                             const VoxelPosition& blockPos, GLuint textureId,
                              float lightValue)
 {
     glm::ivec3 chunkPos3d = {chunkPos.x, chunkPos.y, 0};
@@ -79,7 +79,7 @@ ChunkMesh createGreedyChunkMesh(const Chunk& chunk)
 {
     ChunkMesh mesh;
     auto p = chunk.position();
-    mesh.chunkPosY = chunk.position().y * CHUNK_SIZE;
+    mesh.chunkPosY = chunk.position().y * static_cast<float>(CHUNK_SIZE);
     mesh.chunkPos = chunk.position();
 
     for (int y = 0; y < CHUNK_SIZE; y++)

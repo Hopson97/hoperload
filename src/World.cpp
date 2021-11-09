@@ -45,6 +45,7 @@ World::~World()
 
 void World::update()
 {
+
 }
 
 void World::breakBlock(int x, int y)

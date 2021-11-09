@@ -42,7 +42,8 @@ void Hoperload::onEvent(const sf::Event& e)
             {
                 auto& position = m_player.getTransform().position;
 
-                m_world.placeBlock(position.x, position.y, VoxelType::TEST_TORCH);
+                m_world.placeBlock(static_cast<int>(position.x),
+                                   static_cast<int>(position.y), VoxelType::TEST_TORCH);
             }
             break;
 
@@ -77,6 +78,7 @@ void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window,
 
 void Hoperload::onUpdate(const sf::Time& dt)
 {
+    m_world.update();
     m_camera.update(!freecam);
 
     if (!freecam)
@@ -119,9 +121,9 @@ void Hoperload::onRender()
 
     glEnable(GL_CULL_FACE);
     auto playerTransform = m_player.getTransform();
-    float light =
-        m_world.getLightLevel(playerTransform.position.x, playerTransform.position.y) /
-        15.0f;
+    int l = m_world.getLightLevel(static_cast<int>(playerTransform.position.x),
+                                        static_cast<int>(playerTransform.position.y));
+    float light = l / 15.0f;
     m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
     playerTransform.position.z += Player::box.z / 2;

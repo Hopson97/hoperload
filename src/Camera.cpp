@@ -46,11 +46,11 @@ void Camera::inputFreeCamera(const Keyboard& keyboard, const sf::Window& window)
     m_transform.rotation.y += static_cast<float>(change.x * 0.5);
     sf::Mouse::setPosition({(int)window.getSize().x / 2, (int)window.getSize().y / 2},
                            window);
-    lastMousePosition.x = (int)window.getSize().x / 2;
-    lastMousePosition.y = (int)window.getSize().y / 2;
+    lastMousePosition.x = static_cast<int>(window.getSize().x / 2);
+    lastMousePosition.y = static_cast<int>(window.getSize().y / 2);
 
     m_transform.rotation.x = glm::clamp(m_transform.rotation.x, -89.9f, 89.9f);
-    m_transform.rotation.y = (int)m_transform.rotation.y % 360;
+    m_transform.rotation.y = static_cast<float>(static_cast<int>(m_transform.rotation.y) % 360);
 }
 
 void Camera::update(bool followHook)

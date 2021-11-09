@@ -5,8 +5,9 @@
 
 class Keyboard;
 
-struct Camera
+class Camera
 {
+  public:
     Camera();
 
     void inputFreeCamera(const Keyboard& keyboard, const sf::Window& window);
@@ -27,6 +28,6 @@ struct Camera
 
     ViewFrustum m_frustum;
 
-    glm::mat4 m_projectionMatrix;
-    glm::mat4 m_projectionViewMatrix;
+    glm::mat4 m_projectionMatrix{1.0f};
+    glm::mat4 m_projectionViewMatrix{1.0f};
 };

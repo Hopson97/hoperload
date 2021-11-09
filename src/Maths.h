@@ -19,15 +19,15 @@ class ViewFrustum
     {
         float distanceToPoint(const glm::vec3& point) const;
 
-        float distanceToOrigin;
-        glm::vec3 normal;
+        float distanceToOrigin = 0;
+        glm::vec3 normal{0.0f};
     };
 
   public:
     void update(const glm::mat4& projViewMatrix) noexcept;
 
   private:
-    std::array<Plane, 6> m_planes;
+    std::array<Plane, 6> m_planes{0.0f};
 };
 
 glm::mat4 createModelMatrix(const Transform& transform);

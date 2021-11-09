@@ -19,7 +19,7 @@ struct Colour
     uint8_t alpha = 255;
 };
 
-enum ColourSetMode
+enum class ColourSetMode
 {
     COL_SET_BG = 48,
     COL_SET_FG = 38,
@@ -54,8 +54,8 @@ class Keyboard
     std::array<bool, sf::Keyboard::KeyCount> m_keys{false};
 };
 
-void setTerminalBackgroundColour(Colour colour);
-void setTerminalTextColour(Colour colour);
+void setBackgroundColour(Colour colour);
+void setTextColour(Colour colour);
 
 void setBackgroundColourRGB(uint8_t red, uint8_t green, uint8_t blue);
 void setTextColourRGB(uint8_t red, uint8_t green, uint8_t blue);

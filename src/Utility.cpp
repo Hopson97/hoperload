@@ -66,7 +66,7 @@ static int isColourSame(Colour a, Colour b)
     return a.red == b.red && a.green == b.green && a.blue == b.blue;
 }
 
-static void setTerminalColour(Colour colour, enum ColourSetMode mode)
+static void setTerminalColour(Colour colour, ColourSetMode mode)
 {
     static int isFirstTimeBG = 1;
     static int isFirstTimeFG = 1;
@@ -77,7 +77,7 @@ static void setTerminalColour(Colour colour, enum ColourSetMode mode)
     uint8_t b = colour.blue;
     switch (mode)
     {
-        case COL_SET_BG:
+        case ColourSetMode::COL_SET_BG:
             if (!isColourSame(currentBackgroundColour, colour) || isFirstTimeBG)
             {
                 printf("\x1B[%d;2;%d;%d;%dm", mode, r, g, b);
@@ -85,7 +85,7 @@ static void setTerminalColour(Colour colour, enum ColourSetMode mode)
             }
             break;
 
-        case COL_SET_FG:
+        case ColourSetMode::COL_SET_FG:
             if (!isColourSame(currentTextColour, colour) || isFirstTimeFG)
             {
                 printf("\x1B[%d;2;%d;%d;%dm", mode, r, g, b);
@@ -121,12 +121,12 @@ char* getFileContent(const char* fileName)
 
 void setBackgroundColour(Colour colour)
 {
-    setTerminalColour(colour, COL_SET_BG);
+    setTerminalColour(colour, ColourSetMode::COL_SET_BG);
 }
 
 void setTextColour(Colour colour)
 {
-    setTerminalColour(colour, COL_SET_FG);
+    setTerminalColour(colour, ColourSetMode::COL_SET_FG);
 }
 
 void setTextColourRGB(uint8_t red, uint8_t green, uint8_t blue)
@@ -136,7 +136,7 @@ void setTextColourRGB(uint8_t red, uint8_t green, uint8_t blue)
         green,
         blue,
     };
-    setTerminalColour(colour, COL_SET_FG);
+    setTerminalColour(colour, ColourSetMode::COL_SET_FG);
 }
 
 void setBackgroundColourRGB(uint8_t red, uint8_t green, uint8_t blue)
@@ -146,7 +146,7 @@ void setBackgroundColourRGB(uint8_t red, uint8_t green, uint8_t blue)
         green,
         blue,
     };
-    setTerminalColour(colour, COL_SET_BG);
+    setTerminalColour(colour, ColourSetMode::COL_SET_BG);
 }
 
 bool initWindow(sf::Window* window)
@@ -159,8 +159,7 @@ bool initWindow(sf::Window* window)
     contextSettings.minorVersion = 5;
     contextSettings.attributeFlags = sf::ContextSettings::Core;
     window->create({1600, 900}, "Hoperload", sf::Style::Close, contextSettings);
-    window->setPosition(
-        {(int)sf::VideoMode::getDesktopMode().width / 2 + 150, HEIGHT / 16});
+
     if (!gladLoadGL())
     {
         printf("Error: Could not load OpenGL.");

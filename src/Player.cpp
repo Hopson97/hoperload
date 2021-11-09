@@ -28,7 +28,7 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
         {
             int voxelXOffset = offsetX;
             if (offsetY &&
-                m_transform.position.x - std::floor(m_transform.position.x) > 0.5)
+                m_transform.position.x - std::floorf(m_transform.position.x) > 0.5f)
             {
                 voxelX += 1;
             }
@@ -93,7 +93,7 @@ void Player::update(const sf::Time& dt, std::vector<Particle>& particles)
         pos.y += m_velocity.y * delta;
         resolveCollisions({0, m_velocity.y * delta, 0});
 
-        m_velocity.x *= 0.95;
+        m_velocity.x *= 0.95f;
     }
     else if (m_state == PlayerState::Digging)
     {
@@ -115,7 +115,7 @@ void Player::update(const sf::Time& dt, std::vector<Particle>& particles)
                                ? rand() % 4 - 2
                                : m_digDirection.y * 2.5f * m_digSpeed * -(rand() % 2 - 1),
                            rand() % 3 + 2};
-            p.lifetime = rand() % 5;
+            p.lifetime = static_cast<float>(rand() % 5);
 
             particles.push_back(p);
         }
@@ -169,7 +169,7 @@ void Player::beginDig(int offsetX, int offsetY)
     m_state = PlayerState::Digging;
     m_digProgress = 0;
 
-    if (offsetY && m_transform.position.x - std::floor(m_transform.position.x) > 0.5)
+    if (offsetY && m_transform.position.x - std::floorf(m_transform.position.x) > 0.5)
     {
         voxelX += 1;
     }
@@ -187,11 +187,11 @@ void Player::beginDig(int offsetX, int offsetY)
 void Player::resolveCollisions(const glm::vec3& vel)
 {
     auto& position = m_transform.position;
-    for (int x = position.x; x < position.x + Player::box.x; x++)
+    for (float x = position.x; x < position.x + Player::box.x; x++)
     {
-        for (int y = position.y - Player::box.y; y < position.y; y++)
+        for (float y = position.y - Player::box.y; y < position.y; y++)
         {
-            for (int z = position.z; z < position.z + Player::box.z; z++)
+            for (float z = position.z; z < position.z + Player::box.z; z++)
             {
                 const auto& voxel = getVoxelType((VoxelType)m_pWorld->getVoxel(x, y));
 
