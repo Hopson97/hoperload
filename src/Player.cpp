@@ -27,8 +27,7 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
         auto tryDigHole = [&](int offsetX, int offsetY)
         {
             int voxelXOffset = offsetX;
-            if (offsetY &&
-                m_transform.position.x - std::floorf(m_transform.position.x) > 0.5f)
+            if (offsetY && m_transform.position.x - floorf(m_transform.position.x) > 0.5f)
             {
                 voxelX += 1;
             }
@@ -169,7 +168,7 @@ void Player::beginDig(int offsetX, int offsetY)
     m_state = PlayerState::Digging;
     m_digProgress = 0;
 
-    if (offsetY && m_transform.position.x - std::floorf(m_transform.position.x) > 0.5)
+    if (offsetY && m_transform.position.x - floorf(m_transform.position.x) > 0.5)
     {
         voxelX += 1;
     }
@@ -187,11 +186,11 @@ void Player::beginDig(int offsetX, int offsetY)
 void Player::resolveCollisions(const glm::vec3& vel)
 {
     auto& position = m_transform.position;
-    for (float x = position.x; x < position.x + Player::box.x; x++)
+    for (int x = position.x; x < position.x + Player::box.x; x++)
     {
-        for (float y = position.y - Player::box.y; y < position.y; y++)
+        for (int y = position.y - Player::box.y; y < position.y; y++)
         {
-            for (float z = position.z; z < position.z + Player::box.z; z++)
+            for (int z = position.z; z < position.z + Player::box.z; z++)
             {
                 const auto& voxel = getVoxelType((VoxelType)m_pWorld->getVoxel(x, y));
 
