@@ -80,7 +80,7 @@ static void setTerminalColour(Colour colour, ColourSetMode mode)
         case ColourSetMode::COL_SET_BG:
             if (!isColourSame(currentBackgroundColour, colour) || isFirstTimeBG)
             {
-                printf("\x1B[%d;2;%d;%d;%dm", mode, r, g, b);
+                printf("\x1B[%d;2;%d;%d;%dm", static_cast<int>(mode), r, g, b);
                 isFirstTimeBG = 1;
             }
             break;
@@ -88,7 +88,7 @@ static void setTerminalColour(Colour colour, ColourSetMode mode)
         case ColourSetMode::COL_SET_FG:
             if (!isColourSame(currentTextColour, colour) || isFirstTimeFG)
             {
-                printf("\x1B[%d;2;%d;%d;%dm", mode, r, g, b);
+                printf("\x1B[%d;2;%d;%d;%dm", static_cast<int>(mode), r, g, b);
                 isFirstTimeFG = 1;
             }
             break;
