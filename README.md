@@ -1,6 +1,12 @@
 # hoperload
 
-description here
+Clone of the classic Miniclip game "Motherlode" 
+
+![image](https://user-images.githubusercontent.com/13512660/142701758-58476eda-f058-4679-85a2-647190f0ff5f.png)
+
+![image](https://user-images.githubusercontent.com/13512660/142701802-d139eb3e-bef5-432e-b698-403631a042d6.png)
+
+
 
 ### Windows (Visual Studio)
 
@@ -52,3 +58,5 @@ sh scripts/run.sh release
 ```
 
 []: https://www.sfml-dev.org/download/sfml/2.5.1/
+
+
