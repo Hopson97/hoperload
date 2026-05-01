@@ -31,40 +31,36 @@ Hoperload::Hoperload()
 bool freecam = false;
 void Hoperload::onEvent(const sf::Event& e)
 {
-    switch (e.type)
+    if (auto key = e.getIf<sf::Event::KeyReleased>())
     {
-        case sf::Event::KeyReleased:
-            if (e.key.code == sf::Keyboard::F)
-            {
-                freecam = !freecam;
-            }
-            if (e.key.code == sf::Keyboard::U && !m_player.isDigging())
-            {
-                auto& position = m_player.getTransform().position;
 
-                m_world.placeBlock(static_cast<int>(position.x),
-                                   static_cast<int>(position.y), VoxelType::TEST_TORCH);
-            }
-            break;
+        if (key->code == sf::Keyboard::Key::F)
+        {
+            freecam = !freecam;
+        }
+        if (key->code == sf::Keyboard::Key::U && !m_player.isDigging())
+        {
+            auto& position = m_player.getTransform().position;
 
-        case sf::Event::MouseWheelScrolled:
-            if (e.mouseWheelScroll.delta > 0)
-            {
-                m_camera.zoomIn();
-            }
-            else
-            {
-                m_camera.zoomOut();
-            }
-            break;
+            m_world.placeBlock(static_cast<int>(position.x), static_cast<int>(position.y),
+                               VoxelType::TEST_TORCH);
+        }
+    }
+    if (auto mouseWheelScroll = e.getIf<sf::Event::MouseWheelScrolled>())
+    {
 
-        default:
-            break;
+        if (mouseWheelScroll->delta > 0)
+        {
+            m_camera.zoomIn();
+        }
+        else
+        {
+            m_camera.zoomOut();
+        }
     }
 }
 
-void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window,
-                        bool isMouseActive)
+void Hoperload::onInput(const Keyboard& keyboard, const sf::Window& window, bool isMouseActive)
 {
     if (freecam)
     {
@@ -122,7 +118,7 @@ void Hoperload::onRender()
     glEnable(GL_CULL_FACE);
     auto playerTransform = m_player.getTransform();
     int l = m_world.getLightLevel(static_cast<int>(playerTransform.position.x),
-                                        static_cast<int>(playerTransform.position.y));
+                                  static_cast<int>(playerTransform.position.y));
     float light = l / 15.0f;
     m_sceneShader.set("lightColour", glm::vec3{light, light, light});
 
@@ -140,6 +136,6 @@ void Hoperload::onRender()
 
 void Hoperload::onGUI()
 {
-    guiDebugScreen(m_camera.getTransform());
+    //guiDebugScreen(m_camera.getTransform());
     m_player.gui();
 }

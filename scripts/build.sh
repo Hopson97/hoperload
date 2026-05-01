@@ -19,34 +19,29 @@ target_debug() {
 # Create folder for distribution
 if [ "$1" = "release" ]
 then
-    if [ -d "$hoperload " ]
+    if [ -d "$hoperload" ]
     then
-        rm -rf -d hoperload 
+        rm -rf -d hoperload
     fi
 
-    mkdir -p hoperload 
+    mkdir -p hoperload
 fi
 
 # Creates the folder for the buildaries
-mkdir -p hoperload
-mkdir -p hoperload/Data
+mkdir -p hoperload 
+mkdir -p hoperload/assets
 mkdir -p build
 mkdir -p build/release
 mkdir -p build/debug
 cd build
 
-if [ "$1" = "install" ]
-then
-    conan install .. -s compiler.libcxx=libstdc++11 --build=missing
-fi
-
 # Builds target
 if [ "$1" = "release" ]
 then
     target_release
-    cp build/release/bin/hoperload  hoperload/hoperload 
+    cp build/release/hoperload hoperload/hoperload
 else
     target_debug
 fi
 
-cp -R data hoperload/
+cp -R assets hoperload/

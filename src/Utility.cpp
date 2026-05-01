@@ -151,22 +151,22 @@ void setBackgroundColourRGB(uint8_t red, uint8_t green, uint8_t blue)
 
 bool initWindow(sf::Window* window)
 {
-    sf::ContextSettings contextSettings;
-    contextSettings.depthBits = 24;
-    contextSettings.stencilBits = 8;
-    contextSettings.antialiasingLevel = 4;
-    contextSettings.majorVersion = 4;
-    contextSettings.minorVersion = 5;
-    contextSettings.attributeFlags = sf::ContextSettings::Core;
-    window->create({1600, 900}, "Hoperload", sf::Style::Close, contextSettings);
+    //sf::ContextSettings contextSettings;
+    //contextSettings.depthBits = 24;
+    //contextSettings.stencilBits = 8;
+    //contextSettings.antialiasingLevel = 4;
+    //contextSettings.majorVersion = 4;
+    //contextSettings.minorVersion = 5;
+    //contextSettings.attributeFlags = sf::ContextSettings::Core;
+    //window->create({1600, 900}, "Hoperload", sf::Style::Close, contextSettings);
 
-    if (!gladLoadGL())
-    {
-        printf("Error: Could not load OpenGL.");
-        return false;
-    }
-    initGLDebug();
-    glCullFace(GL_BACK);
+    //if (!gladLoadGL())
+    //{
+    //    printf("Error: Could not load OpenGL.");
+    //    return false;
+    //}
+    //initGLDebug();
+    //glCullFace(GL_BACK);
     return true;
 }
 

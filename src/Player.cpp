@@ -32,9 +32,9 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
                 voxelX += 1;
             }
 
-            if (m_isOnGround && getVoxelType((VoxelType)m_pWorld->getVoxel(
-                                                 voxelX + voxelXOffset, voxelY + offsetY))
-                                    .collidable)
+            if (m_isOnGround &&
+                getVoxelType((VoxelType)m_pWorld->getVoxel(voxelX + voxelXOffset, voxelY + offsetY))
+                    .collidable)
             {
                 beginDig(offsetX, offsetY);
                 return true;
@@ -42,18 +42,18 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
             return false;
         };
 
-        if (keyboard.isKeyDown(sf::Keyboard::W))
+        if (keyboard.isKeyDown(sf::Keyboard::Key::W))
         {
             m_velocity.y += PLAYER_SPEED;
         }
-        else if (keyboard.isKeyDown(sf::Keyboard::S) && m_isOnGround)
+        else if (keyboard.isKeyDown(sf::Keyboard::Key::S) && m_isOnGround)
         {
             if (tryDigHole(0, -1))
             {
                 return;
             }
         }
-        if (keyboard.isKeyDown(sf::Keyboard::A))
+        if (keyboard.isKeyDown(sf::Keyboard::Key::A))
         {
             if (m_isTouchingWall && tryDigHole(-1, 0))
             {
@@ -61,7 +61,7 @@ void Player::input(const Keyboard& keyboard, const sf::Window& window)
             }
             m_velocity.x -= PLAYER_SPEED;
         }
-        else if (keyboard.isKeyDown(sf::Keyboard::D))
+        else if (keyboard.isKeyDown(sf::Keyboard::Key::D))
         {
 
             if (m_isTouchingWall && tryDigHole(1, 0))
@@ -105,15 +105,14 @@ void Player::update(const sf::Time& dt, std::vector<Particle>& particles)
         if (rand() % 5 >= 2)
         {
             Particle p;
-            p.transform.position = pos + glm::vec3{Player::box.x / 2.0f,
-                                                   -Player::box.y / 2.0f, Player::box.z};
-            p.direction = {m_digDirection.x == 0
-                               ? rand() % 4 - 2
-                               : m_digDirection.x * 2.5f * m_digSpeed * -(rand() % 2 - 1),
-                           m_digDirection.y == 0
-                               ? rand() % 4 - 2
-                               : m_digDirection.y * 2.5f * m_digSpeed * -(rand() % 2 - 1),
-                           rand() % 3 + 2};
+            p.transform.position =
+                pos + glm::vec3{Player::box.x / 2.0f, -Player::box.y / 2.0f, Player::box.z};
+            p.direction = {
+                m_digDirection.x == 0 ? rand() % 4 - 2
+                                      : m_digDirection.x * 2.5f * m_digSpeed * -(rand() % 2 - 1),
+                m_digDirection.y == 0 ? rand() % 4 - 2
+                                      : m_digDirection.y * 2.5f * m_digSpeed * -(rand() % 2 - 1),
+                rand() % 3 + 2};
             p.lifetime = static_cast<float>(rand() % 5);
 
             particles.push_back(p);
@@ -129,22 +128,21 @@ void Player::update(const sf::Time& dt, std::vector<Particle>& particles)
 
 void Player::gui()
 {
-    auto ctx = getGuiContext();
-    if (nk_begin(ctx, "Player", nk_rect(10, 150, 300, 130), 0))
-    {
-        nk_layout_row_dynamic(ctx, 12, 1);
-        nk_labelf(ctx, NK_STATIC, "Player Velcoity: (%.*f, %.*f, %.*f)", 2, m_velocity[0],
-                  2, m_velocity[1], 2, m_velocity[2]);
+    //auto ctx = getGuiContext();
+    //if (nk_begin(ctx, "Player", nk_rect(10, 150, 300, 130), 0))
+    //{
+    //    nk_layout_row_dynamic(ctx, 12, 1);
+    //    nk_labelf(ctx, NK_STATIC, "Player Velcoity: (%.*f, %.*f, %.*f)", 2, m_velocity[0], 2,
+    //              m_velocity[1], 2, m_velocity[2]);
 
-        nk_labelf(ctx, NK_STATIC, "Dig Direction: (%.*f, %.*f)", 2, m_digDirection[0], 2,
-                  m_digDirection[1]);
+    //    nk_labelf(ctx, NK_STATIC, "Dig Direction: (%.*f, %.*f)", 2, m_digDirection[0], 2,
+    //              m_digDirection[1]);
 
-        nk_labelf(ctx, NK_STATIC, "Dig Target: (%.*f, %.*f)", 2, m_digTarget[0], 2,
-                  m_digTarget[1]);
+    //    nk_labelf(ctx, NK_STATIC, "Dig Target: (%.*f, %.*f)", 2, m_digTarget[0], 2, m_digTarget[1]);
 
-        nk_labelf(ctx, NK_STATIC, "Digging Progress: %.*f", 2, m_digProgress);
-    }
-    nk_end(ctx);
+    //    nk_labelf(ctx, NK_STATIC, "Digging Progress: %.*f", 2, m_digProgress);
+    //}
+    //nk_end(ctx);
 }
 
 const Transform& Player::getTransform() const
@@ -179,8 +177,7 @@ void Player::beginDig(int offsetX, int offsetY)
     // Player's final position after mining - for linear interpolation between current and
     // final location
     m_digStartPosition = m_transform.position.xy();
-    m_digTarget =
-        glm::vec2(voxelX + offsetX + Player::box.x / 4, voxelY + offsetY + Player::box.y);
+    m_digTarget = glm::vec2(voxelX + offsetX + Player::box.x / 4, voxelY + offsetY + Player::box.y);
 }
 
 void Player::resolveCollisions(const glm::vec3& vel)

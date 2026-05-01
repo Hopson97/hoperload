@@ -2,7 +2,7 @@
 
 if [ "$1" = "release" ]
 then
-    ./build/release/bin/hoperload 
+    ./build/release/hoperload
 else
-    ./build/debug/bin/hoperload 
+    ./build/debug/hoperload
 fi

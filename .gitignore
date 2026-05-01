@@ -1,13 +1,9 @@
 # Linux
-/bin
-hoperload
 build/
 
 # Windows
 *.dll
 *.exe
-*.sln
-*.vcxproj
 *.filters
 *.user
 *.vs
@@ -21,3 +17,12 @@ Release/
 *.srctrlprj
 *.srctrldb
 *.srctrlbm
+
+# Vcpkg
+vcpkg_installed/
+
+hoperload/
+
+*.blend
+*.blend1
+urbania

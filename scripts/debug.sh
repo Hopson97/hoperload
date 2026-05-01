@@ -1,4 +1,4 @@
 #!/bin/bash
 
-sh scripts/build.sh
-gdb ./build/debug/bin/hoperload 
+./scripts/build.sh
+gdb ./build/debug/hoperload  

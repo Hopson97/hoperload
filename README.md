@@ -1,48 +1,68 @@
-# hoperload
+# Hoperload
 
-Clone of the classic Miniclip game "Motherlode" 
+OpenGL template project with wrappers around the basic OpenGL objects.
 
-![image](https://user-images.githubusercontent.com/13512660/142701758-58476eda-f058-4679-85a2-647190f0ff5f.png)
+This contains two examples: Application and ApplicationMinimal.
 
-![image](https://user-images.githubusercontent.com/13512660/142701802-d139eb3e-bef5-432e-b698-403631a042d6.png)
+Application has lighting, while ApplicationMinimal is just simple scene with no lighting.
 
+This should be created with https://gist.github.com/Hopson97/b42c686a949d682e16f0d5dc01b48cd2
 
+## Building and Running
 
 ### Windows (Visual Studio)
 
-The easiest way to build is to use [vcpkg](https://vcpkg.io/en/index.html) and install SFML through this.
+The easiest way to build is to use [vcpkg](https://vcpkg.io/en/index.html) and install dependencies through this:
 
 ```bash
 vcpkg install sfml
+vcpkg install imgui
+vcpkg install glm
 vcpkg integrate install
 ```
 
-Create a new visual studio C++ empty project, git clone the files, and copy them into the project directory.
-
-Select the "Show All Files" options in Solution Explorer, and right-click on the src/ and deps/ directory, and choose the "include in project options"
-
-Go into the project properies and under `C/C++ > General`, add the deps/ directory as an additional include directy.
-
-
-Finally, under `Linker > Input`, add OpenGL32.lib as an additional dependancy. 
+Then open the Visual Studio project file to build and run.
 
 ### Linux
 
-Requires conan w/ bincrafters and cmake.
+#### Pre-requisites
+
+Install Vcpkg and other required packages using your distribution's package manager:
 
 ```sh
-python3 -m pip install conan
-conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
-conan remote update bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.sh
+
+# These are required to build some packages
+sudo apt install cmake make autoconf libtool pkg-config
+
+# The following are required for SFML
+sudo apt install libx11-dev xorg-dev freeglut3-dev libudev-dev
 ```
+
+Ensure paths are set correctly:
+
+```sh
+export VCPKG_ROOT=/path/to/vcpkg
+export PATH=$VCPKG_ROOT:$PATH
+```
+
+RECOMMENDED: Add the above lines to your `.bashrc` or `.zshrc` file:
+
+```sh
+echo 'export VCPKG_ROOT=/path/to/vcpkg' >> ~/.bashrc
+echo 'export PATH=$VCPKG_ROOT:$PATH' >> ~/.bashrc
+```
+
+#### Build and Run
 
 To build, at the root of the project:
 
 ```sh
-sh scripts/build.sh install
+vcpkg install # First time only
+sh scripts/build.sh
 ```
-
-The install argument is only needed for the first time compilation as this is what grabs the libraries from Conan
 
 To run, at the root of the project:
 
@@ -57,6 +77,21 @@ sh scripts/build.sh release
 sh scripts/run.sh release
 ```
 
-[]: https://www.sfml-dev.org/download/sfml/2.5.1/
+## Credits
 
+--
 
+Grass texture: https://opengameart.org/content/tileable-grass-textures-set-1
+
+--
+
+Box texture from LearnOpenGL: https://learnopengl.com/Lighting/Lighting-maps
+
+--
+
+Skybox texture from ThinMatrix tutorial, also from here: https://opengameart.org/content/miramar-skybox
+
+https://www.dropbox.com/sh/phslacd8v9i17wb/AABui_-C-yhKvZ1H2wb3NykIa?dl=0
+https://www.youtube.com/watch?v=_Ix5oN8eC1E
+
+--

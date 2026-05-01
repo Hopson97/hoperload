@@ -35,23 +35,29 @@ class Keyboard
 
     bool isKeyDown(sf::Keyboard::Key key) const
     {
-        return m_keys[key];
+        return m_keys[(size_t)key];
     }
 
-    void update(sf::Event e)
+    void update(const sf::Event& event)
     {
-        if (e.type == sf::Event::KeyPressed)
+        if (auto* key = event.getIf<sf::Event::KeyPressed>())
         {
-            m_keys[e.key.code] = true;
+            if ((size_t)key->code < m_keys.size())
+            {
+                m_keys[(size_t)key->code] = true;
+            }
         }
-        else if (e.type == sf::Event::KeyReleased)
+        else if (auto* key = event.getIf<sf::Event::KeyReleased>())
         {
-            m_keys[e.key.code] = false;
+            if ((size_t)key->code < m_keys.size())
+            {
+                m_keys[(size_t)key->code] = false;
+            }
         }
     }
 
   private:
-    std::array<bool, sf::Keyboard::KeyCount> m_keys{false};
+    std::array<bool, sf::Keyboard::KeyCount> m_keys;
 };
 
 void setBackgroundColour(Colour colour);

@@ -19,23 +19,23 @@ Camera::Camera()
 void Camera::inputFreeCamera(const Keyboard& keyboard, const sf::Window& window)
 {
     float PLAYER_SPEED = 0.25;
-    if (keyboard.isKeyDown(sf::Keyboard::LControl))
+    if (keyboard.isKeyDown(sf::Keyboard::Key::LControl))
     {
         PLAYER_SPEED = 1.0f;
     }
-    if (keyboard.isKeyDown(sf::Keyboard::W))
+    if (keyboard.isKeyDown(sf::Keyboard::Key::W))
     {
         m_transform.position += forwardsVector(m_transform.rotation) * PLAYER_SPEED;
     }
-    else if (keyboard.isKeyDown(sf::Keyboard::S))
+    else if (keyboard.isKeyDown(sf::Keyboard::Key::S))
     {
         m_transform.position += backwardsVector(m_transform.rotation) * PLAYER_SPEED;
     }
-    if (keyboard.isKeyDown(sf::Keyboard::A))
+    if (keyboard.isKeyDown(sf::Keyboard::Key::A))
     {
         m_transform.position += leftVector(m_transform.rotation) * PLAYER_SPEED;
     }
-    else if (keyboard.isKeyDown(sf::Keyboard::D))
+    else if (keyboard.isKeyDown(sf::Keyboard::Key::D))
     {
         m_transform.position += rightVector(m_transform.rotation) * PLAYER_SPEED;
     }
@@ -44,8 +44,7 @@ void Camera::inputFreeCamera(const Keyboard& keyboard, const sf::Window& window)
     auto change = sf::Mouse::getPosition(window) - lastMousePosition;
     m_transform.rotation.x -= static_cast<float>(change.y * 0.5);
     m_transform.rotation.y += static_cast<float>(change.x * 0.5);
-    sf::Mouse::setPosition({(int)window.getSize().x / 2, (int)window.getSize().y / 2},
-                           window);
+    sf::Mouse::setPosition({(int)window.getSize().x / 2, (int)window.getSize().y / 2}, window);
     lastMousePosition.x = static_cast<int>(window.getSize().x / 2);
     lastMousePosition.y = static_cast<int>(window.getSize().y / 2);
 
@@ -63,10 +62,9 @@ void Camera::update(bool followHook)
     {
         assert(mp_hook);
 
-        m_transform.position = {
-            glm::clamp(mp_hook->position.x, (float)CHUNK_SIZE / 2,
-                       (float)worldWidth * CHUNK_SIZE - CHUNK_SIZE / 2),
-            mp_hook->position.y, m_zoom};
+        m_transform.position = {glm::clamp(mp_hook->position.x, (float)CHUNK_SIZE / 2,
+                                           (float)worldWidth * CHUNK_SIZE - CHUNK_SIZE / 2),
+                                mp_hook->position.y, m_zoom};
         m_transform.rotation = {0, 270, 0};
     }
 }

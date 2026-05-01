@@ -39,7 +39,7 @@ void Texture2D::loadFromFile(const char* file, int mipmapLevels)
     int height = img.getSize().y;
 
     glTextureStorage2D(m_handle, mipmapLevels, GL_RGBA8, width, height);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    //glGenerateMipmap(GL_TEXTURE_2D);
     glTextureSubImage2D(m_handle, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE,
                         img.getPixelsPtr());
     useDefaultFilters();
